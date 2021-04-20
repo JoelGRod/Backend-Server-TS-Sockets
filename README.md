@@ -7,3 +7,7 @@
     Work with:
     tsc --watch (live ts compilator)
     npm run dev (nodemon)
+
+# Server config (endpoints and app middlewares)
+    index.ts
+    server/
