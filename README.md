@@ -1,4 +1,4 @@
-# Node - Express REST Server (Typescript)
+# Node - Express REST Server (Typescript)(Sockets)
 
 # Steps:
     First time:
