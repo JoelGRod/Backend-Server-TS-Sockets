@@ -1,5 +1,7 @@
+// Libraries
 import dotenv from 'dotenv';
-import Server from './classes/server';
+// App
+import Server from './server/server';
 
 // Environment variables
 dotenv.config();
@@ -7,8 +9,15 @@ dotenv.config();
 const server = new Server();
 
 // Middlewares
+// Cors
+server.cors()
+// Read and parse body (middleware) - access to request data in body
+server.body_parse();
+// Routes
+server.define_routes();
 
 // Start server
-server.start( () => {
+server.start_server( () => {
     console.log(`Server running on port: ${ server.port }`);
 } );
+
