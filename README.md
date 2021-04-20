@@ -8,6 +8,7 @@
     tsc --watch (live ts compilator)
     npm run dev (nodemon)
 
-# Server config (endpoints and app middlewares)
+# Server configuration 
+    Base endpoints URLs and express app middlewares:
     index.ts
     server/
