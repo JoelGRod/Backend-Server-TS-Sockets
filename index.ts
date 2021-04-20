@@ -6,7 +6,7 @@ import Server from './server/server';
 // Environment variables
 dotenv.config();
 // Create new server
-const server = new Server();
+const server = Server.instance;
 
 // Middlewares
 // Cors
