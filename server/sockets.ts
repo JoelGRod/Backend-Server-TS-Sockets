@@ -4,7 +4,7 @@ import socketIO from 'socket.io';
 // Interfaces
 interface MsgPayload {
     from: string;
-    body: string;
+    msg: string;
 }
 
 export const disconnect = (client: Socket) => {
