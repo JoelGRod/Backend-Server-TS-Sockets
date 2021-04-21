@@ -9,8 +9,10 @@ dotenv.config();
 const server = Server.instance;
 
 // Middlewares
-// Cors
+
+// Cors (sockets error)
 server.cors()
+
 // Read and parse body (middleware) - access to request data in body
 server.body_parse();
 // Routes

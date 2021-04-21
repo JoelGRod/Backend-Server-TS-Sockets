@@ -3,6 +3,8 @@ import cors from 'cors';
 import msg_router from '../messages/routes';
 import socketIO from 'socket.io';
 import http from 'http';
+// Sockets events
+import * as socket from './sockets';
 
 export default class Server {
 
@@ -21,7 +23,12 @@ export default class Server {
         this.port = Number(process.env.PORT);
 
         this.http_server = new http.Server(this.app);
-        this.io = new socketIO.Server(this.http_server);
+        this.io = new socketIO.Server(this.http_server, {
+            cors: {
+                origin: true,
+                credentials: true
+            }
+        });
 
         this.listen_to_sockets();
     }
@@ -31,6 +38,7 @@ export default class Server {
         return this._instance || (this._instance = new this());
     }
 
+    // Socket error?
     cors() {
         this.app.use(cors({origin: true, credentials: true}));
     }
@@ -49,11 +57,21 @@ export default class Server {
         this.http_server.listen( this.port, callback);
     }
 
-    // Sockets
+    // Sockets - ALL SOCKETS EVENTS GOES HERE
     private listen_to_sockets() {
         console.log("Listen to sockets");
         this.io.on('connection', client => {
             console.log("New connected client");
+
+            // ALL SOCKETS EVENTS GOES BELOW HERE
+
+            // Messages
+            socket.get_message(client, this.io);
+            // Disconnected client
+            socket.disconnect(client);
+            // client.on('disconnect', () => {
+            //     console.log("Client disconnected");
+            // });
         });
     }
 
