@@ -10,7 +10,7 @@ const server = Server.instance;
 
 // Middlewares
 
-// Cors (sockets error)
+// Cors (Express)
 server.cors()
 
 // Read and parse body (middleware) - access to request data in body

@@ -38,7 +38,7 @@ export default class Server {
         return this._instance || (this._instance = new this());
     }
 
-    // Socket error?
+    // Express cors
     cors() {
         this.app.use(cors({origin: true, credentials: true}));
     }
