@@ -12,7 +12,6 @@ const server = Server.instance;
 
 // Cors (Express)
 server.cors()
-
 // Read and parse body (middleware) - access to request data in body
 server.body_parse();
 // Routes

@@ -5,6 +5,9 @@ import socketIO from 'socket.io';
 import http from 'http';
 // Sockets events
 import * as socket from './sockets';
+// DB connection
+import dbConnection from './db-config';
+
 
 export default class Server {
 
@@ -21,7 +24,10 @@ export default class Server {
     private constructor() {
         this.app = express();
         this.port = Number(process.env.PORT);
-
+        // DB Connection
+        dbConnection();
+        
+        // Sockets
         this.http_server = new http.Server(this.app);
         this.io = new socketIO.Server(this.http_server, {
             cors: {
