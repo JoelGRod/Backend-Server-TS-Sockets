@@ -54,15 +54,78 @@ export const create_user = async ( req: Request, res: Response ) => {
 }
 
 export const login_user = async ( req: Request, res: Response ) => {
-    return res.json({
-        ok: true,
-        msg: 'Login user'
-    })
+    const { email, password } = req.body;
+
+    try {
+        // User exists? (email)
+        const user_db = await User.findOne({ email });
+
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Wrong credentials - Username does not exist' // In production change msg to 'Wrong credentials' for security reasons
+            });
+        }
+
+        // Is the password correct??
+        const is_correct_password = bcrypt.compareSync(password, user_db.password);
+
+        if (!is_correct_password) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Wrong credentials - Wrong password' // In production change msg to 'Wrong credentials' for security reasons
+            });
+        }
+
+        // Generate JWT
+        const token = await create_jwt(user_db.id, user_db.name);
+
+        // Successful response
+        return res.status(201).json({
+            ok: true,
+            uid: user_db.id,
+            name: user_db.name,
+            email: user_db.email,
+            token: token
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
 export const renew_token = async ( req: Request, res: Response ) => {
-    return res.json({
-        ok: true,
-        msg: 'Renew token'
-    })
+    const { uid, name } = req.body;
+
+    try {
+        // User exists? (email)
+        const user_db = await User.findById(uid);
+        if(!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'User not found'
+            });
+        }
+        // Generate JWT
+        const token = await create_jwt(uid, name);
+        // Successful response
+        return res.json({
+            ok: true,
+            uid: user_db.id,
+            name: user_db.name,
+            email: user_db.email,
+            token: token
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }

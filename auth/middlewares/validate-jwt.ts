@@ -19,14 +19,14 @@ const validate_jwt = (req: Request, res: Response, next: NextFunction) => {
     }
 
     try {
-        const { uid, name } = jwt.verify(token, String(process.env.SECRET_JWT_SEED)) as UserToken;
+        const { uid, name } = jwt.verify(token, String(process.env.SECRET_JWT_SEED)) as UserToken;  // Interesting
+        const data = { ...req.body };
+        req.body = {
+            ...data,
+            uid: uid,
+            name: name
+        };
 
-        console.log(uid, name);
-
-        // TODO: ADD THIS TO REQUEST OBJECT, FIND A SOLUTION
-        
-        // req.user_data = { uid, name };
-        
         next(); // Everything In Its Right Place :)
     } catch (error) {
         return res.status(401).json({
