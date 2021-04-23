@@ -1,12 +1,14 @@
 import express from 'express';
 import cors from 'cors';
-import msg_router from '../messages/routes';
 import socketIO from 'socket.io';
 import http from 'http';
 // Sockets events
 import * as socket from './sockets';
 // DB connection
 import dbConnection from './db-config';
+// Routes
+import msg_router from '../messages/routes';
+import auth_router from '../auth/routes';
 
 
 export default class Server {
@@ -56,7 +58,8 @@ export default class Server {
 
     // Domain routes
     define_routes() {
-        this.app.use('/', msg_router);
+        this.app.use('/api/msg/', msg_router);
+        this.app.use('/api/auth/', auth_router);
     }
 
     start_server( callback: VoidFunction ) {
