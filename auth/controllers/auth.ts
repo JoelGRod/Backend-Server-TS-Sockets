@@ -122,7 +122,33 @@ export const renew_token = async ( req: Request, res: Response ) => {
         });
 
     } catch (error) {
-        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
+}
+
+export const check_email = async ( req: Request, res: Response ) => {
+
+    const { email } = req.query;
+
+    try {
+        // User exists? (email)
+        const user_db = await User.findOne({ email });
+        if (user_db) {
+            return res.status(200).json({
+                ok: true,
+                msg: 'Email already exists'
+            });
+        } else {
+            return res.status(200).json({
+                ok: false,
+                msg: 'The email does not exist'
+            });
+        }
+
+    } catch (error) {
         return res.status(500).json({
             ok: false,
             msg: 'Please contact the administrator'

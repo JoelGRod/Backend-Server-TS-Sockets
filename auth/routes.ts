@@ -4,7 +4,7 @@ import { check } from 'express-validator';
 import validate_jwt from './middlewares/validate-jwt';
 import validate_fields from '../shared/middlewares/validate-fields';
 // Controllers
-import { create_user, login_user, renew_token } from './controllers/auth';
+import { create_user, login_user, renew_token, check_email } from './controllers/auth';
 
 const auth_router = Router();
 
@@ -25,5 +25,11 @@ auth_router.post('/login', [
 auth_router.get('/renew', [
     validate_jwt
 ], renew_token );
+
+auth_router.get('/check_email', [
+    check('email', 'Email is required').isEmail(),
+    validate_fields
+], check_email);
+
 
 export default auth_router;
