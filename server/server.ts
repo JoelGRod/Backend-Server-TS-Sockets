@@ -74,6 +74,8 @@ export default class Server {
 
             // ALL SOCKETS EVENTS GOES BELOW HERE
 
+            // Login socket user
+            socket.chat_user(client, this.io);
             // Messages
             socket.get_message(client, this.io);
             // Disconnected client
