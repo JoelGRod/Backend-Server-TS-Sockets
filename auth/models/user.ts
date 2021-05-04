@@ -14,6 +14,7 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    // Chat implementation
     rooms: [
         {
             type: Schema.Types.ObjectId,

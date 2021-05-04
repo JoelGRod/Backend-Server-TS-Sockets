@@ -4,7 +4,7 @@ import { check } from 'express-validator';
 import validate_jwt from '../auth/middlewares/validate-jwt';
 import validate_fields from '../shared/middlewares/validate-fields';
 // Controllers
-import { create_chat_user } from './controllers/chat';
+import { create_chat_user, update_chat_user } from './controllers/chat';
 
 const chat_router = Router();
 
@@ -13,5 +13,13 @@ chat_router.post('/create-chat-user', [
     validate_fields,
     validate_jwt
 ], create_chat_user);
+
+chat_router.put('/update-chat-user', [
+    check('new_nickname', 'nickname is required and must be unique').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], update_chat_user);
+
+
 
 export default chat_router;
