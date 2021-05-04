@@ -1,20 +1,17 @@
 import { Schema, model } from 'mongoose';
 
-const RoomSchema = new Schema({
-    name: {
+const ChatUserSchema = new Schema({
+    nickname: {
         type: String,
         required: true,
         unique: true
     },
-    password: {
-        type: String
-    },
-    chatusers: [
+    rooms: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'ChatUser'
+            ref: "Room"
         }
     ]
 });
 
-export default model('Room', RoomSchema);
+export default model('ChatUser', ChatUserSchema);

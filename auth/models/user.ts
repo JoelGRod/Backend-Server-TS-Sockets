@@ -13,7 +13,19 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    rooms: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Room'
+        }
+    ],
+    chatusers: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'ChatUser'
+        }
+    ]
 });
 
 export default model('User', UserSchema);
