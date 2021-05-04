@@ -9,6 +9,7 @@ import dbConnection from './db-config';
 // Routes
 import msg_router from '../messages/routes';
 import auth_router from '../auth/routes';
+import chat_router from '../chat/routes';
 
 
 export default class Server {
@@ -60,6 +61,7 @@ export default class Server {
     define_routes() {
         this.app.use('/api/msg/', msg_router);
         this.app.use('/api/auth/', auth_router);
+        this.app.use('/api/chat/', chat_router);
     }
 
     start_server( callback: VoidFunction ) {
