@@ -6,13 +6,36 @@ const RoomSchema = new Schema({
         required: true,
         unique: true
     },
+    desc: {
+        type: String,
+        required: true
+    },
+    photo: {
+        type: String,
+        required: false
+    },
     password: {
-        type: String
+        type: String,
+        required: false
+    },
+    created_at: {
+        type: Date,
+        required: true
+    },
+    modified_at: {
+        type: Date,
+        required: false
     },
     chatusers: [
         {
             type: Schema.Types.ObjectId,
             ref: 'ChatUser'
+        }
+    ],
+    msgs: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Msg'
         }
     ]
 });

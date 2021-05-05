@@ -6,10 +6,32 @@ const ChatUserSchema = new Schema({
         required: true,
         unique: true
     },
+    desc: {
+        type: String,
+        required: true
+    },
+    photo: {
+        type: String,
+        required: true
+    },
+    created_at: {
+        type: Date,
+        required: true
+    },
+    modified_at: {
+        type: Date,
+        required: false
+    },
     rooms: [
         {
             type: Schema.Types.ObjectId,
             ref: "Room"
+        }
+    ],
+    msgs: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Msg"
         }
     ]
 });
