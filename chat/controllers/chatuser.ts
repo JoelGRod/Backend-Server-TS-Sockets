@@ -182,16 +182,51 @@ export const update_chat_user_info = async ( req: Request, res: Response ) => {
 
 // Get all chat users 
 export const get_all_chat_users = async (req: Request, res: Response) => { 
-    //TODO
+    try {
+        const chat_users = await ChatUser.find({}, {nickname: 1, photo: 1, _id: 0});
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'get all chat users',
+            chat_users
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
 // Get chat users from one main user
 export const get_user_chat_users = async (req: Request, res: Response) => { 
     //TODO
+    try {
+        return res.status(200).json({
+            ok: true,
+            msg: 'get user chat users'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
 // Delete one specific chat user
 export const delete_chat_user = async (req: Request, res: Response) => { 
     //TODO
+    try {
+        return res.status(200).json({
+            ok: true,
+            msg: 'delete chat user'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
