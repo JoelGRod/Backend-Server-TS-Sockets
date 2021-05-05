@@ -200,7 +200,7 @@ export const get_all_chat_users = async (req: Request, res: Response) => {
 
 // Get chat users from one main user
 export const get_user_chat_users = async (req: Request, res: Response) => { 
-    //TODO
+
     const { uid } = req.body;
     try {
         // Main User exists?
@@ -229,11 +229,59 @@ export const get_user_chat_users = async (req: Request, res: Response) => {
 // Delete one specific chat user
 export const delete_chat_user = async (req: Request, res: Response) => { 
     //TODO
+    const { uid, chat_user_id } = req.body;
     try {
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if(!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // chat_user belongs to main user?
+        const is_chat_user_valid = chat_user_belongs_to_user(user_db.chatusers, chat_user_id);
+        if(!is_chat_user_valid) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The chat user does not belong to the user'
+            });
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // STEP I: Delete chat user from rooms where is connected
+        // TODO
+        const chat_user_db = ChatUser.findById(chat_user_id);
+        const connected_rooms = chat_user_db.rooms;
+            // Get room
+            // get chat users array 
+            // delete chat user 
+            // save room with new chat user array
+            // Move next room in array
+        console.log(connected_rooms);
+        ///////////////////////////////////////////////////////////////////////
+
+        // SETEP II: Delete chat user from User
+        const user_chat_users = user_db.chatusers.filter(function(id: String) {
+            return id != chat_user_id;
+        });
+        await user_db.updateOne(
+            { chatusers: user_chat_users }
+        );
+
+        // Delete chat user
+        await ChatUser.deleteOne(
+            { _id: chat_user_id }, 
+            { new: true }
+        );
+
         return res.status(200).json({
             ok: true,
-            msg: 'delete chat user'
+            msg: 'delete chat user',
+            chat_users: user_chat_users
         });
+
     } catch (error) {
         return res.status(500).json({
             ok: false,
