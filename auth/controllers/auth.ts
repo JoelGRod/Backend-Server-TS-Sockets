@@ -129,6 +129,7 @@ export const renew_token = async ( req: Request, res: Response ) => {
     }
 }
 
+// Async validator ?
 export const check_email = async ( req: Request, res: Response ) => {
 
     const { email } = req.query;
