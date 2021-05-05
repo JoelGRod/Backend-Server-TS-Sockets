@@ -270,7 +270,7 @@ export const delete_chat_user = async (req: Request, res: Response) => {
             { chatusers: user_chat_users }
         );
 
-        // Delete chat user
+        // STEP III: Delete chat user
         await ChatUser.deleteOne(
             { _id: chat_user_id }, 
             { new: true }

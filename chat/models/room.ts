@@ -12,7 +12,7 @@ const RoomSchema = new Schema({
     },
     photo: {
         type: String,
-        required: false
+        required: true
     },
     password: {
         type: String,
