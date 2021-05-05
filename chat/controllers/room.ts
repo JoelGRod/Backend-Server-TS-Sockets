@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 // Model
 import User from '../../auth/models/user';
-import ChatUser from '../models/user-chat';
+import ChatUser from '../models/chatuser';
 import Room from '../models/room';
 
 export const get_room_chat_users = async (req: Request, res: Response) => { 
