@@ -201,10 +201,22 @@ export const get_all_chat_users = async (req: Request, res: Response) => {
 // Get chat users from one main user
 export const get_user_chat_users = async (req: Request, res: Response) => { 
     //TODO
+    const { uid } = req.body;
     try {
+        // Main User exists?
+        const exclusions = "-__v -rooms -msgs";
+        const user_db = await User.findById(uid).populate('chatusers', exclusions);
+        if(!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
         return res.status(200).json({
             ok: true,
-            msg: 'get user chat users'
+            msg: 'get user chat users',
+            chat_users: user_db.chatusers
         });
     } catch (error) {
         return res.status(500).json({
