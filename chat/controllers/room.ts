@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
+// Encrypt passwords
+import * as bcrypt from 'bcryptjs';
 // Model
 import User from '../../auth/models/user';
-import ChatUser from '../models/chatuser';
 import Room from '../models/room';
+import ChatUser from '../models/chatuser';
 
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => { 
@@ -18,28 +20,46 @@ export const create_chat_room = async (req: Request, res: Response) => {
             });
         };
 
-        return res.status(200).json({
-            ok: true,
-            msg: 'room created'
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if(!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        }
+ 
+        // Create chat room
+        const room_db = new Room({
+            name,
+            desc,
+            photo,
+            password,
+            created_at: Date.now()
         });
-        
-    } catch (error) {
-        return res.status(500).json({
-            ok: false,
-            msg: 'Please contact the administrator'
+        // Encrypt/hash password
+        const salt = bcrypt.genSaltSync();  // Default 10 rounds
+        room_db.password = bcrypt.hashSync(password, salt);
+        // Save chat user in db
+        await room_db.save();
+        // Update user_db chat_users array
+        await user_db.updateOne({
+            $push: {
+                rooms: {
+                    _id: room_db.id
+                }
+            }
         });
-    }
-}
 
-// Get all chat users from a room
-export const get_room_chat_users = async (req: Request, res: Response) => { 
-    //TODO
-    const { room_id } = req.body;
-    try {
+        // Succesful response
         return res.status(200).json({
             ok: true,
-            msg: 'chat users from room',
-            roomId: room_id
+            msg: 'room created',
+            room_id: room_db.id,
+            room_name: room_db.name,
+            desc: room_db.desc,
+            photo: room_db.photo,
+            created_at: room_db.created_at
         });
         
     } catch (error) {
@@ -60,6 +80,25 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
             msg: 'chat user connected to room',
             room_id,
             chat_user_id
+        });
+        
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
+}
+
+// Get all chat users from a room
+export const get_room_chat_users = async (req: Request, res: Response) => { 
+    //TODO
+    const { room_id } = req.body;
+    try {
+        return res.status(200).json({
+            ok: true,
+            msg: 'chat users from room',
+            roomId: room_id
         });
         
     } catch (error) {

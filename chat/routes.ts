@@ -24,7 +24,9 @@ import {
 
 const chat_router = Router();
 
+//////////////////////////////////////////////////////////////////
 // Chat User Routes
+//////////////////////////////////////////////////////////////////
 chat_router.post('/create-chat-user', [
     check('nickname', 'nickname is required and must be unique').isLength({min: 3}),
     check('desc', 'desc is required').isLength({min: 3}),
@@ -61,8 +63,11 @@ chat_router.delete('/delete-chat-user', [
     validate_fields,
     validate_jwt
 ], delete_chat_user);
+//////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////
 // Room routes
+//////////////////////////////////////////////////////////////////
 chat_router.post('/create-chat-room', [
     check('name', 'name is required and must be unique').isLength({min: 3}),
     check('desc', 'desc or no desc msg is required').isLength({min: 3}),
@@ -97,6 +102,6 @@ chat_router.delete('/delete-chat-room', [
     validate_fields,
     validate_jwt
 ], delete_chat_room);
-
+//////////////////////////////////////////////////////////////////
 
 export default chat_router;
