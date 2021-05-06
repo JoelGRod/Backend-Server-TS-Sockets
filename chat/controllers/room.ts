@@ -9,13 +9,13 @@ import ChatUser from '../models/chatuser';
 import { is_another_user_profile_connected, it_belongs_to } from "../helpers/chat";
 
 // Create Chat Room
-export const create_chat_room = async (req: Request, res: Response) => { 
+export const create_chat_room = async (req: Request, res: Response) => {
 
     const { room_name, desc, photo, password, uid } = req.body;
     try {
         // Room name exists?
-        const room = await Room.findOne({name: room_name});
-        if(room) {
+        const room = await Room.findOne({ name: room_name });
+        if (room) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Room name already exists'
@@ -24,13 +24,13 @@ export const create_chat_room = async (req: Request, res: Response) => {
 
         // Main User exists?
         const user_db = await User.findById(uid);
-        if(!user_db) {
+        if (!user_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Invalid main user'
             });
         }
- 
+
         // Create chat room
         const room_db = new Room({
             name: room_name,
@@ -63,7 +63,7 @@ export const create_chat_room = async (req: Request, res: Response) => {
             photo: room_db.photo,
             created_at: room_db.created_at
         });
-        
+
     } catch (error) {
         return res.status(500).json({
             ok: false,
@@ -74,7 +74,7 @@ export const create_chat_room = async (req: Request, res: Response) => {
 }
 
 // Add chat user to chat room
-export const add_chat_user_chat_room = async (req: Request, res: Response) => { 
+export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
     const { room_id, chat_user_id, room_password, uid } = req.body;
     try {
@@ -82,7 +82,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
         // Security Validations
         // Main User exists?
         const user_db = await User.findById(uid);
-        if(!user_db) {
+        if (!user_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Invalid main user'
@@ -91,7 +91,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
         // Room exists?
         const room_db = await Room.findById(room_id);
-        if(!room_db) {
+        if (!room_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Room does not exists'
@@ -100,7 +100,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
         // chat user exists
         const chat_user_db = await ChatUser.findById(chat_user_id);
-        if(!chat_user_db) {
+        if (!chat_user_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Chat user does not exists'
@@ -109,7 +109,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
         // chat_user belongs to main user?
         const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_id);
-        if(!is_chat_user_valid) {
+        if (!is_chat_user_valid) {
             return res.status(400).json({
                 ok: false,
                 msg: 'The chat user does not belong to the user'
@@ -127,7 +127,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
         // Is user chat in room already?
         const is_chat_user_in_room = it_belongs_to(room_db.chatusers, chat_user_id);
-        if(is_chat_user_in_room) {
+        if (is_chat_user_in_room) {
             return res.status(400).json({
                 ok: false,
                 msg: 'The chat user is already connected'
@@ -136,7 +136,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
         // Is another main user chat user connected to room
         const is_another_main_user_profile_connected = is_another_user_profile_connected(user_db.chatusers, room_db.chatusers);
-        if(is_another_main_user_profile_connected) {
+        if (is_another_main_user_profile_connected) {
             return res.status(400).json({
                 ok: false,
                 msg: 'The User has another profile connected'
@@ -167,7 +167,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
             chat_user: chat_user_db.nickname,
             room: room_db.name
         });
-        
+
     } catch (error) {
         return res.status(500).json({
             ok: false,
@@ -178,14 +178,14 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 }
 
 // remove user from chat room
-export const remove_chat_user_chat_room = async (req: Request, res: Response) => { 
+export const remove_chat_user_chat_room = async (req: Request, res: Response) => {
 
     const { room_id, chat_user_id, uid } = req.body;
     try {
         // Security Validations
         // Main User exists?
         const user_db = await User.findById(uid);
-        if(!user_db) {
+        if (!user_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Invalid main user'
@@ -194,7 +194,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 
         // Room exists?
         const room_db = await Room.findById(room_id);
-        if(!room_db) {
+        if (!room_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Room does not exists'
@@ -203,7 +203,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 
         // chat user exists
         const chat_user_db = await ChatUser.findById(chat_user_id);
-        if(!chat_user_db) {
+        if (!chat_user_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Chat user does not exists'
@@ -212,7 +212,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 
         // chat_user belongs to main user?
         const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_id);
-        if(!is_chat_user_valid) {
+        if (!is_chat_user_valid) {
             return res.status(400).json({
                 ok: false,
                 msg: 'The chat user does not belong to the user'
@@ -221,7 +221,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 
         // Is user chat in room already?
         const is_chat_user_in_room = it_belongs_to(room_db.chatusers, chat_user_id);
-        if(!is_chat_user_in_room) {
+        if (!is_chat_user_in_room) {
             return res.status(400).json({
                 ok: false,
                 msg: 'The chat user is not connected to room'
@@ -230,7 +230,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 
         // Remove chat user from Room
         // STEP I: Remove chat user from Room chat users array
-        const room_chat_users = room_db.chatusers.filter(function(id: String) {
+        const room_chat_users = room_db.chatusers.filter(function (id: String) {
             return id != chat_user_db.id;
         });
         await room_db.updateOne(
@@ -238,7 +238,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
         );
 
         // STEP II: Remove room from Chat_user rooms array
-        const chat_user_rooms = chat_user_db.rooms.filter(function(id: String) {
+        const chat_user_rooms = chat_user_db.rooms.filter(function (id: String) {
             return id != room_db.id;
         });
         await chat_user_db.updateOne(
@@ -251,7 +251,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
             nickname: chat_user_db.nickname,
             room: room_db.name
         });
-        
+
     } catch (error) {
         return res.status(500).json({
             ok: false,
@@ -261,14 +261,14 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 }
 
 // Get all chat users from a room
-export const get_room_chat_users = async (req: Request, res: Response) => { 
+export const get_room_chat_users = async (req: Request, res: Response) => {
     //TODO
     const { room_id, uid } = req.body;
     try {
         // Security Validations
         // Main User exists?
         const user_db = await User.findById(uid);
-        if(!user_db) {
+        if (!user_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Invalid main user'
@@ -278,7 +278,7 @@ export const get_room_chat_users = async (req: Request, res: Response) => {
         // Room exists? and populate chatusers from room
         const exclusions: String = '-_id -rooms -msgs -created_at -__v';
         const room_db = await Room.findById(room_id).populate('chatusers', exclusions);
-        if(!room_db) {
+        if (!room_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Room does not exists'
@@ -291,7 +291,7 @@ export const get_room_chat_users = async (req: Request, res: Response) => {
             room: room_db.name,
             chat_users: room_db.chatusers
         });
-        
+
     } catch (error) {
         return res.status(500).json({
             ok: false,
@@ -301,14 +301,14 @@ export const get_room_chat_users = async (req: Request, res: Response) => {
 }
 
 // Delete chat room
-export const delete_chat_room = async (req: Request, res: Response) => { 
-    //TODO
+export const delete_chat_room = async (req: Request, res: Response) => {
+
     const { uid, room_id } = req.body;
     try {
         // Security Validations
         // Main User exists?
         const user_db = await User.findById(uid);
-        if(!user_db) {
+        if (!user_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Invalid main user'
@@ -317,7 +317,7 @@ export const delete_chat_room = async (req: Request, res: Response) => {
 
         // Room exists
         const room_db = await Room.findById(room_id);
-        if(!room_db) {
+        if (!room_db) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Room does not exists'
@@ -326,7 +326,7 @@ export const delete_chat_room = async (req: Request, res: Response) => {
 
         // Room belongs to main user? is main user the creator?
         const is_room_valid = it_belongs_to(user_db.rooms, room_id);
-        if(!is_room_valid) {
+        if (!is_room_valid) {
             return res.status(400).json({
                 ok: false,
                 msg: 'The Room does not belong to the main user'
@@ -336,24 +336,24 @@ export const delete_chat_room = async (req: Request, res: Response) => {
         ///////////////////////////////////////////////////////////////////////
         // STEP I: Delete chat room from every chat_user rooms array
         const connected_users = room_db.chatusers;
-            // Get chat_user
-            // get rooms array 
-            // delete room 
-            // save chat_user with new room array
-            // Move next chat_user in array
-            for(let chat_user_id of connected_users) {
-                const chat_user_db = await ChatUser.findById(chat_user_id);
-                const chat_user_rooms = chat_user_db.rooms.filter((id: String) => {
-                    return id != room_id;
-                });
-                await chat_user_db.updateOne(
-                    { rooms: chat_user_rooms }
-                );
-            };
+        // Get chat_user
+        // get rooms array 
+        // delete room 
+        // save chat_user with new room array
+        // Move next chat_user in array
+        for (let chat_user_id of connected_users) {
+            const chat_user_db = await ChatUser.findById(chat_user_id);
+            const chat_user_rooms = chat_user_db.rooms.filter((id: String) => {
+                return id != room_id;
+            });
+            await chat_user_db.updateOne(
+                { rooms: chat_user_rooms }
+            );
+        };
         ///////////////////////////////////////////////////////////////////////
 
         // STEP II: Delete room from User
-        const user_rooms = user_db.rooms.filter( (id: String) => {
+        const user_rooms = user_db.rooms.filter((id: String) => {
             return id != room_id;
         });
         await user_db.updateOne(
@@ -373,7 +373,7 @@ export const delete_chat_room = async (req: Request, res: Response) => {
             user: user_db.name,
             con_usr: connected_users
         });
-        
+
     } catch (error) {
         return res.status(500).json({
             ok: false,
