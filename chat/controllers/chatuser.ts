@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 // Model
 import User from '../../auth/models/user';
 import ChatUser from '../models/chatuser';
-import Room from '../models/room';
+// import Room from '../models/room';
 // Helpers
 import { chat_user_belongs_to_user } from "../helpers/chatuser";
 

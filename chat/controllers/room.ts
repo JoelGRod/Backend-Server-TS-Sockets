@@ -5,10 +5,12 @@ import * as bcrypt from 'bcryptjs';
 import User from '../../auth/models/user';
 import Room from '../models/room';
 import ChatUser from '../models/chatuser';
+// Helpers
+import { chat_user_belongs_to_user } from "../helpers/chatuser";
 
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => { 
-    //TODO
+
     const { name, desc, photo, password, uid } = req.body;
     try {
         // Room name exists?
@@ -73,11 +75,96 @@ export const create_chat_room = async (req: Request, res: Response) => {
 // Add chat user to chat room
 export const add_chat_user_chat_room = async (req: Request, res: Response) => { 
     //TODO
+    const { room_id, chat_user_id, room_password, uid } = req.body;
+    try {
+
+        // Security Validations
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if(!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // Room exists?
+        const room_db = await Room.findById(room_id);
+        if(!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        }
+
+        // chat user exists
+        const chat_user_db = await ChatUser.findById(chat_user_id);
+        if(!chat_user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Chat user does not exists'
+            });
+        }
+
+        // chat_user belongs to main user?
+        const is_chat_user_valid = chat_user_belongs_to_user(user_db.chatusers, chat_user_id);
+        if(!is_chat_user_valid) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The chat user does not belong to the user'
+            });
+        }
+
+        // Is the chat room password correct??
+        const is_correct_password = bcrypt.compareSync(room_password, room_db.password);
+        if (!is_correct_password) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Wrong room password'
+            });
+        }
+
+        // Add chat user to room
+        // STEP I: Update room_db chat_users array
+        await room_db.updateOne({
+            $push: {
+                chatusers: {
+                    _id: chat_user_db.id
+                }
+            }
+        });
+        // STEP II: Update chat_user_db rooms array
+        await chat_user_db.updateOne({
+            $push: {
+                rooms: {
+                    _id: room_db.id
+                }
+            }
+        });
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'chat user connected to room',
+            chat_user: chat_user_db.nickname,
+            room: room_db.name
+        });
+        
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
+}
+
+// remove user from chat room
+export const remove_chat_user_chat_room = async (req: Request, res: Response) => { 
+    //TODO
     const { room_id, chat_user_id } = req.body;
     try {
         return res.status(200).json({
             ok: true,
-            msg: 'chat user connected to room',
+            msg: 'Removed user from room',
             room_id,
             chat_user_id
         });
@@ -99,26 +186,6 @@ export const get_room_chat_users = async (req: Request, res: Response) => {
             ok: true,
             msg: 'chat users from room',
             roomId: room_id
-        });
-        
-    } catch (error) {
-        return res.status(500).json({
-            ok: false,
-            msg: 'Please contact the administrator'
-        });
-    }
-}
-
-// remove user from chat room
-export const remove_chat_user_chat_room = async (req: Request, res: Response) => { 
-    //TODO
-    const { room_id, chat_user_id } = req.body;
-    try {
-        return res.status(200).json({
-            ok: true,
-            msg: 'Removed user from room',
-            room_id,
-            chat_user_id
         });
         
     } catch (error) {
