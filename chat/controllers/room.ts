@@ -179,7 +179,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
 // remove user from chat room
 export const remove_chat_user_chat_room = async (req: Request, res: Response) => { 
-    //TODO
+
     const { room_id, chat_user_id, uid } = req.body;
     try {
         // Security Validations
@@ -236,6 +236,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
         await room_db.updateOne(
             { chatusers: room_chat_users }
         );
+        
         // STEP II: Remove room from Chat_user rooms array
         const chat_user_rooms = chat_user_db.rooms.filter(function(id: String) {
             return id != room_db.id;
