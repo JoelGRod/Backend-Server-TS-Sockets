@@ -228,7 +228,7 @@ export const get_user_chat_users = async (req: Request, res: Response) => {
 
 // Delete one specific chat user
 export const delete_chat_user = async (req: Request, res: Response) => { 
-    //TODO
+
     const { uid, chat_user_id } = req.body;
     try {
         // Main User exists?
