@@ -245,7 +245,7 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         if (!chat_user_db) {
             return res.status(400).json({
                 ok: false,
-                msg: 'Chat user does not exists does not exists'
+                msg: 'Chat user does not exists'
             });
         };
 
