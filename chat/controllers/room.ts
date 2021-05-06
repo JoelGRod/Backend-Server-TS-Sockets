@@ -6,7 +6,7 @@ import User from '../../auth/models/user';
 import Room from '../models/room';
 import ChatUser from '../models/chatuser';
 // Helpers
-import { chat_user_belongs_to_user } from "../helpers/chatuser";
+import { is_chat_user_belongs_to } from "../helpers/chatuser";
 
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => { 
@@ -107,7 +107,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
         }
 
         // chat_user belongs to main user?
-        const is_chat_user_valid = chat_user_belongs_to_user(user_db.chatusers, chat_user_id);
+        const is_chat_user_valid = is_chat_user_belongs_to(user_db.chatusers, chat_user_id);
         if(!is_chat_user_valid) {
             return res.status(400).json({
                 ok: false,
@@ -121,6 +121,15 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
             return res.status(400).json({
                 ok: false,
                 msg: 'Wrong room password'
+            });
+        }
+
+        // Is user chat in room already?
+        const is_chat_user_in_room = is_chat_user_belongs_to(room_db.chatusers, chat_user_id);
+        if(is_chat_user_in_room) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The chat user is already connected'
             });
         }
 
