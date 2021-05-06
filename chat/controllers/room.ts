@@ -6,7 +6,7 @@ import User from '../../auth/models/user';
 import Room from '../models/room';
 import ChatUser from '../models/chatuser';
 // Helpers
-import { is_chat_user_belongs_to } from "../helpers/chatuser";
+import { is_another_user_profile_connected, is_chat_user_belongs_to } from "../helpers/chatuser";
 
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => { 
@@ -96,7 +96,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
                 msg: 'Room does not exists'
             });
         }
-
+        
         // chat user exists
         const chat_user_db = await ChatUser.findById(chat_user_id);
         if(!chat_user_db) {
@@ -133,6 +133,15 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
             });
         }
 
+        // Is another main user chat user connected to room
+        const is_another_main_user_profile_connected = is_another_user_profile_connected(user_db.chatusers, room_db.chatusers);
+        if(is_another_main_user_profile_connected) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The User has another profile connected'
+            });
+        }
+
         // Add chat user to room
         // STEP I: Update room_db chat_users array
         await room_db.updateOne({
@@ -161,7 +170,8 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(500).json({
             ok: false,
-            msg: 'Please contact the administrator'
+            msg: 'Please contact the administrator',
+            error
         });
     }
 }
