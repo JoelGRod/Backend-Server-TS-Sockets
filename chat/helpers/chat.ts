@@ -1,8 +1,7 @@
-import { ObjectId } from "mongoose";
 
-export const is_chat_user_belongs_to = (chat_users: String[], chat_user_id: String) => {
-    for(let chat_user of chat_users) {
-        if(chat_user.toString() == chat_user_id) {
+export const it_belongs_to = (ids_array: String[], id_to_check: String) => {
+    for(let id of ids_array) {
+        if(id.toString() == id_to_check) {
             return true;
         }
     }

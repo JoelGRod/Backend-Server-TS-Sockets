@@ -4,7 +4,7 @@ import User from '../../auth/models/user';
 import ChatUser from '../models/chatuser';
 // import Room from '../models/room';
 // Helpers
-import { is_chat_user_belongs_to } from "../helpers/chatuser";
+import { it_belongs_to } from "../helpers/chat";
 
 // Create new chat user
 export const create_chat_user = async (req: Request, res: Response ) => {
@@ -79,7 +79,7 @@ export const update_chat_user_nickname = async (req: Request, res: Response) => 
         };
 
         // chat_user belongs to main user?
-        const is_chat_user_valid = is_chat_user_belongs_to(user_db.chatusers, chat_user_id);
+        const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_id);
         if(!is_chat_user_valid) {
             return res.status(400).json({
                 ok: false,
@@ -141,7 +141,7 @@ export const update_chat_user_info = async ( req: Request, res: Response ) => {
         };
 
         // chat_user belongs to main user?
-        const is_chat_user_valid = is_chat_user_belongs_to(user_db.chatusers, chat_user_id);
+        const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_id);
         if(!is_chat_user_valid) {
             return res.status(400).json({
                 ok: false,
@@ -241,13 +241,13 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         };
 
         // chat_user belongs to main user?
-        const is_chat_user_valid = is_chat_user_belongs_to(user_db.chatusers, chat_user_id);
+        const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_id);
         if(!is_chat_user_valid) {
             return res.status(400).json({
                 ok: false,
                 msg: 'The chat user does not belong to the user'
             });
-        }
+        };
 
         ///////////////////////////////////////////////////////////////////////
         // STEP I: Delete chat user from rooms where is connected
