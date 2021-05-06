@@ -69,7 +69,7 @@ chat_router.delete('/delete-chat-user', [
 // Room routes
 //////////////////////////////////////////////////////////////////
 chat_router.post('/create-chat-room', [
-    check('name', 'name is required and must be unique').isLength({min: 3}),
+    check('room_name', 'name is required and must be unique').isLength({min: 3}),
     check('desc', 'desc or no desc msg is required').isLength({min: 3}),
     check('photo', 'photo url or no photo msg is required').isLength({min: 3}),
     check('password', 'password or no password msg is required').isLength({min: 3}),

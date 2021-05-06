@@ -11,10 +11,10 @@ import { is_another_user_profile_connected, is_chat_user_belongs_to } from "../h
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => { 
 
-    const { name, desc, photo, password, uid } = req.body;
+    const { room_name, desc, photo, password, uid } = req.body;
     try {
         // Room name exists?
-        const room = await Room.findOne({name});
+        const room = await Room.findOne({name: room_name});
         if(room) {
             return res.status(400).json({
                 ok: false,
@@ -33,7 +33,7 @@ export const create_chat_room = async (req: Request, res: Response) => {
  
         // Create chat room
         const room_db = new Room({
-            name,
+            name: room_name,
             desc,
             photo,
             password,
@@ -67,7 +67,8 @@ export const create_chat_room = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(500).json({
             ok: false,
-            msg: 'Please contact the administrator'
+            msg: 'Please contact the administrator',
+            error
         });
     }
 }
@@ -96,7 +97,7 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
                 msg: 'Room does not exists'
             });
         }
-        
+
         // chat user exists
         const chat_user_db = await ChatUser.findById(chat_user_id);
         if(!chat_user_db) {
@@ -179,13 +180,75 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 // remove user from chat room
 export const remove_chat_user_chat_room = async (req: Request, res: Response) => { 
     //TODO
-    const { room_id, chat_user_id } = req.body;
+    const { room_id, chat_user_id, uid } = req.body;
     try {
+        // Security Validations
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if(!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // Room exists?
+        const room_db = await Room.findById(room_id);
+        if(!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        }
+
+        // chat user exists
+        const chat_user_db = await ChatUser.findById(chat_user_id);
+        if(!chat_user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Chat user does not exists'
+            });
+        }
+
+        // chat_user belongs to main user?
+        const is_chat_user_valid = is_chat_user_belongs_to(user_db.chatusers, chat_user_id);
+        if(!is_chat_user_valid) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The chat user does not belong to the user'
+            });
+        }
+
+        // Is user chat in room already?
+        const is_chat_user_in_room = is_chat_user_belongs_to(room_db.chatusers, chat_user_id);
+        if(!is_chat_user_in_room) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The chat user is not connected to room'
+            });
+        }
+
+        // Remove chat user from Room
+        // STEP I: Remove chat user from Room chat users array
+        const room_chat_users = room_db.chatusers.filter(function(id: String) {
+            return id != chat_user_db.id;
+        });
+        await room_db.updateOne(
+            { chatusers: room_chat_users }
+        );
+        // STEP II: Remove room from Chat_user rooms array
+        const chat_user_rooms = chat_user_db.rooms.filter(function(id: String) {
+            return id != room_db.id;
+        });
+        await chat_user_db.updateOne(
+            { rooms: chat_user_rooms }
+        );
+
         return res.status(200).json({
             ok: true,
             msg: 'Removed user from room',
-            room_id,
-            chat_user_id
+            nickname: chat_user_db.nickname,
+            room: room_db.name
         });
         
     } catch (error) {
