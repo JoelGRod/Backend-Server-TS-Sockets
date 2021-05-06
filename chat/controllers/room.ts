@@ -73,6 +73,21 @@ export const create_chat_room = async (req: Request, res: Response) => {
     }
 }
 
+// Modify Room Name
+export const modify_room_name = async (req: Request, res: Response) => {
+    //TODO
+}
+
+// Modify Room info
+export const modify_room_info = async (req: Request, res: Response) => {
+    //TODO
+}
+
+// Get All chat rooms
+export const get_all_chat_rooms = async (req: Request, res: Response) => {
+    //TODO
+}
+
 // Add chat user to chat room
 export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
@@ -262,7 +277,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 
 // Get all chat users from a room
 export const get_room_chat_users = async (req: Request, res: Response) => {
-    //TODO
+
     const { room_id, uid } = req.body;
     try {
         // Security Validations

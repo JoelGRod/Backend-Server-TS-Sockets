@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 // Model
 import User from '../../auth/models/user';
 import ChatUser from '../models/chatuser';
-// import Room from '../models/room';
+import Room from '../models/room';
 // Helpers
 import { it_belongs_to } from "../helpers/chat";
 
@@ -240,6 +240,15 @@ export const delete_chat_user = async (req: Request, res: Response) => {
             });
         };
 
+        // Chat user exists
+        const chat_user_db = await ChatUser.findById(chat_user_id);
+        if (!chat_user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Chat user does not exists does not exists'
+            });
+        };
+
         // chat_user belongs to main user?
         const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_id);
         if(!is_chat_user_valid) {
@@ -252,18 +261,25 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         ///////////////////////////////////////////////////////////////////////
         // STEP I: Delete chat user from rooms where is connected
         // TODO
-        const chat_user_db = ChatUser.findById(chat_user_id);
         const connected_rooms = chat_user_db.rooms;
             // Get room
             // get chat users array 
             // delete chat user 
             // save room with new chat user array
             // Move next room in array
-        console.log(connected_rooms);
+        for (let room_id of connected_rooms) {
+            const room_db = await Room.findById(room_id);
+            const room_chat_users = room_db.chatusers.filter((id: String) => {
+                return id != chat_user_id;
+            });
+            await room_db.updateOne(
+                { chatusers: room_chat_users }
+            );
+        };
         ///////////////////////////////////////////////////////////////////////
 
         // SETEP II: Delete chat user from User
-        const user_chat_users = user_db.chatusers.filter(function(id: String) {
+        const user_chat_users = user_db.chatusers.filter((id: String) => {
             return id != chat_user_id;
         });
         await user_db.updateOne(
@@ -279,7 +295,9 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         return res.status(200).json({
             ok: true,
             msg: 'delete chat user',
-            chat_users: user_chat_users
+            chat_user: chat_user_db.nickname,
+            user: user_db.name,
+            con_rooms: connected_rooms
         });
 
     } catch (error) {
