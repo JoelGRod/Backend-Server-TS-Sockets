@@ -7,6 +7,7 @@ import Room from '../models/room';
 import ChatUser from '../models/chatuser';
 // Helpers
 import { is_another_user_profile_connected, is_chat_user_belongs_to } from "../helpers/chatuser";
+import room from "../models/room";
 
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => { 
@@ -75,7 +76,7 @@ export const create_chat_room = async (req: Request, res: Response) => {
 
 // Add chat user to chat room
 export const add_chat_user_chat_room = async (req: Request, res: Response) => { 
-    //TODO
+
     const { room_id, chat_user_id, room_password, uid } = req.body;
     try {
 
@@ -236,7 +237,7 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
         await room_db.updateOne(
             { chatusers: room_chat_users }
         );
-        
+
         // STEP II: Remove room from Chat_user rooms array
         const chat_user_rooms = chat_user_db.rooms.filter(function(id: String) {
             return id != room_db.id;
@@ -263,12 +264,33 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 // Get all chat users from a room
 export const get_room_chat_users = async (req: Request, res: Response) => { 
     //TODO
-    const { room_id } = req.body;
+    const { room_id, uid } = req.body;
     try {
+        // Security Validations
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if(!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        }
+
+        // Room exists? and populate chatusers from room
+        const exclusions: String = '-_id -rooms -msgs -created_at -__v';
+        const room_db = await Room.findById(room_id).populate('chatusers', exclusions);
+        if(!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        }
+
         return res.status(200).json({
             ok: true,
             msg: 'chat users from room',
-            roomId: room_id
+            room: room_db.name,
+            chat_users: room_db.chatusers
         });
         
     } catch (error) {
