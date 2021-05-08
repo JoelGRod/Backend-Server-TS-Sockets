@@ -37,7 +37,11 @@ const RoomSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Msg'
         }
-    ]
+    ],
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }
 });
 
 export default model('Room', RoomSchema);

@@ -8,7 +8,16 @@ const MsgSchema = new Schema({
     created_at: {
         type: Date,
         required: true
+    },
+    room: {
+        type: Schema.Types.ObjectId,
+        ref: "Room"
+    },
+    chatuser: {
+        type: Schema.Types.ObjectId,
+        ref: "ChatUser"
     }
+
 });
 
 export default model('Msg', MsgSchema);
