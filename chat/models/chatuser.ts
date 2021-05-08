@@ -22,6 +22,7 @@ const ChatUserSchema = new Schema({
         type: Date,
         required: false
     },
+    // Refs
     rooms: [
         {
             type: Schema.Types.ObjectId,

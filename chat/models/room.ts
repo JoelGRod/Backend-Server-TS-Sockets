@@ -26,6 +26,7 @@ const RoomSchema = new Schema({
         type: Date,
         required: false
     },
+    // Refs
     chatusers: [
         {
             type: Schema.Types.ObjectId,

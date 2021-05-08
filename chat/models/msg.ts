@@ -9,6 +9,7 @@ const MsgSchema = new Schema({
         type: Date,
         required: true
     },
+    // Refs
     room: {
         type: Schema.Types.ObjectId,
         ref: "Room"
