@@ -21,7 +21,8 @@ import {
     delete_chat_room, 
     modify_room_name,
     modify_room_info,
-    modify_room_password
+    modify_room_password,
+    get_all_chat_rooms
 } from './controllers/room';
 
 
@@ -108,6 +109,10 @@ chat_router.get('/room-chat-users', [
     validate_fields,
     validate_jwt
 ], get_room_chat_users);
+
+chat_router.get('/rooms', [
+    validate_jwt
+], get_all_chat_rooms);
 
 chat_router.put('/add-chat-user-to-room', [
     check('room_id', 'Room ID is required').isLength({min: 3}),
