@@ -17,7 +17,6 @@ const MsgSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "ChatUser"
     }
-
 });
 
 export default model('Msg', MsgSchema);

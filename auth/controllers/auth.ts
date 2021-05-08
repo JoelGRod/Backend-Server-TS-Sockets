@@ -8,7 +8,7 @@ import create_jwt from '../helpers/jwt';
 
 
 export const create_user = async ( req: Request, res: Response ) => {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
 
     try {
         // Verify that the email does not exist
@@ -37,12 +37,14 @@ export const create_user = async ( req: Request, res: Response ) => {
         // Successful response
         return res.status(201).json({
             ok: true,
+            msg: `User ${user_db.name} created`
             // Delete this part of the response in future, 
             // you dont need this in a register action
-            uid: user_db.id,
-            name: user_db.name,
-            email: user_db.email,
-            token: token
+            // uid: user_db.id,
+            // name: user_db.name,
+            // email: user_db.email,
+            // token: token,
+
         });
 
     } catch (error) {
@@ -83,6 +85,7 @@ export const login_user = async ( req: Request, res: Response ) => {
         // Successful response
         return res.status(201).json({
             ok: true,
+            msg: `User ${user_db.name} logged`,
             uid: user_db.id,
             name: user_db.name,
             email: user_db.email,
@@ -115,6 +118,7 @@ export const renew_token = async ( req: Request, res: Response ) => {
         // Successful response
         return res.json({
             ok: true,
+            msg: `User ${user_db.name} renew`,
             uid: user_db.id,
             name: user_db.name,
             email: user_db.email,
