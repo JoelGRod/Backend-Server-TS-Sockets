@@ -263,7 +263,7 @@ export const modify_room_password = async (req: Request, res: Response) => {
 // Get All chat rooms
 export const get_all_chat_rooms = async (req: Request, res: Response) => {
     try {
-        const rooms = await Room.find({}, {name: 1, desc: 1, photo: 1});
+        const rooms = await Room.find({}, { name: 1, desc: 1, photo: 1 });
 
         return res.status(200).json({
             ok: true,
@@ -281,11 +281,25 @@ export const get_all_chat_rooms = async (req: Request, res: Response) => {
 
 // Get Main user chat rooms (rooms created by him/her)
 export const get_main_user_chat_rooms = async (req: Request, res: Response) => {
-    //TODO
-    const { } = req.body;
+
+    const { uid } = req.body;
 
     try {
+        // Main User exists?
+        const exclusions = "-__v -chatusers -msgs -password -user";
+        const user_db = await User.findById(uid).populate('rooms', exclusions);
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
 
+        return res.status(200).json({
+            ok: true,
+            msg: 'Get user created Rooms',
+            rooms: user_db.rooms
+        });
     } catch (error) {
         return res.status(500).json({
             ok: false,
