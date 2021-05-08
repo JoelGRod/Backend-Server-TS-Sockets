@@ -49,11 +49,13 @@ export const create_chat_user = async (req: Request, res: Response ) => {
         return res.status(200).json({
             ok: true,
             msg: `Chat User ${nickname} added`,
-            chat_user_id: chat_user_db.id,
-            nickname: chat_user_db.nickname,
-            desc: chat_user_db.desc,
-            photo: chat_user_db.photo,
-            created_at: chat_user_db.created_at
+            chatuser: {
+                _id: chat_user_db.id,
+                nickname: chat_user_db.nickname,
+                desc: chat_user_db.desc,
+                photo: chat_user_db.photo,
+                created_at: chat_user_db.created_at,
+            }
         });
 
     } catch (error) {
@@ -110,12 +112,14 @@ export const update_chat_user_nickname = async (req: Request, res: Response) => 
         return res.status(200).json({
             ok: true,
             msg: `Chat User Updated`,
-            chat_user_id: chat_user_db.id,
-            nickname: chat_user_db.nickname,
-            desc: chat_user_db.desc,
-            photo: chat_user_db.photo,
-            created_at: chat_user_db.created_at,
-            modified_at: chat_user_db.modified_at
+            chatuser: {
+                _id: chat_user_db.id,
+                nickname: chat_user_db.nickname,
+                desc: chat_user_db.desc,
+                photo: chat_user_db.photo,
+                created_at: chat_user_db.created_at,
+                modified_at: chat_user_db.modified_at
+            }
         });
   
     } catch (error) {
@@ -164,12 +168,14 @@ export const update_chat_user_info = async ( req: Request, res: Response ) => {
         return res.status(200).json({
             ok: true,
             msg: `Chat User Updated`,
-            chat_user_id: chat_user_db.id,
-            nickname: chat_user_db.nickname,
-            desc: chat_user_db.desc,
-            photo: chat_user_db.photo,
-            created_at: chat_user_db.created_at,
-            modified_at: chat_user_db.modified_at
+            chatuser: {
+                _id: chat_user_db.id,
+                nickname: chat_user_db.nickname,
+                desc: chat_user_db.desc,
+                photo: chat_user_db.photo,
+                created_at: chat_user_db.created_at,
+                modified_at: chat_user_db.modified_at
+            }
         });
   
     } catch (error) {
@@ -183,12 +189,12 @@ export const update_chat_user_info = async ( req: Request, res: Response ) => {
 // Get all chat users 
 export const get_all_chat_users = async (req: Request, res: Response) => { 
     try {
-        const chat_users = await ChatUser.find({}, {nickname: 1, photo: 1, _id: 0});
+        const chatusers = await ChatUser.find({}, {nickname: 1, desc: 1, photo: 1, _id: 0});
 
         return res.status(200).json({
             ok: true,
             msg: 'get all chat users',
-            chat_users
+            chatusers
         });
     } catch (error) {
         return res.status(500).json({
@@ -216,7 +222,7 @@ export const get_user_chat_users = async (req: Request, res: Response) => {
         return res.status(200).json({
             ok: true,
             msg: 'get user chat users',
-            chat_users: user_db.chatusers
+            chatusers: user_db.chatusers
         });
     } catch (error) {
         return res.status(500).json({
@@ -260,7 +266,6 @@ export const delete_chat_user = async (req: Request, res: Response) => {
 
         ///////////////////////////////////////////////////////////////////////
         // STEP I: Delete chat user from rooms where is connected
-        // TODO
         const connected_rooms = chat_user_db.rooms;
             // Get room
             // get chat users array 
@@ -295,9 +300,10 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         return res.status(200).json({
             ok: true,
             msg: 'delete chat user',
-            chat_user: chat_user_db.nickname,
-            user: user_db.name,
-            con_rooms: connected_rooms
+            chatuser: {
+                _id: chat_user_db.id,
+                nickname: chat_user_db.nickname
+            }
         });
 
     } catch (error) {
