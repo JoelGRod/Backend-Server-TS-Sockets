@@ -89,6 +89,11 @@ export const get_all_chat_rooms = async (req: Request, res: Response) => {
     //TODO
 }
 
+// Get Main user chat rooms (rooms created by him/her)
+export const get_main_user_chat_rooms = async (req: Request, res: Response) => {
+    //TODO
+}
+
 // Add chat user to chat room
 export const add_chat_user_chat_room = async (req: Request, res: Response) => {
 
