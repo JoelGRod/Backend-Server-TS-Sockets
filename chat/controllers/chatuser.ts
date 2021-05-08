@@ -33,7 +33,8 @@ export const create_chat_user = async (req: Request, res: Response ) => {
             nickname,
             desc,
             photo,
-            created_at: Date.now()
+            created_at: Date.now(),
+            user: user_db.id
         });
         // Save chat user in db
         await chat_user_db.save();

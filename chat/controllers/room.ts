@@ -37,7 +37,8 @@ export const create_chat_room = async (req: Request, res: Response) => {
             desc,
             photo,
             password,
-            created_at: Date.now()
+            created_at: Date.now(),
+            user: user_db.id
         });
         // Encrypt/hash password
         const salt = bcrypt.genSaltSync();  // Default 10 rounds
@@ -61,7 +62,7 @@ export const create_chat_room = async (req: Request, res: Response) => {
                 _id: room_db.id,
                 name: room_db.name,
                 desc: room_db.desc,
-                photo: room_db.photo, 
+                photo: room_db.photo,
                 created_at: room_db.created_at
             }
         });
@@ -76,22 +77,152 @@ export const create_chat_room = async (req: Request, res: Response) => {
 
 // Modify Room Name
 export const modify_room_name = async (req: Request, res: Response) => {
-    //TODO
+    const { uid, room_id, new_name } = req.body;
+
+    try {
+        // Main User exists
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // Room exists
+        const room_db = await Room.findById(room_id);
+        if (!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        }
+
+        // Room belongs to main user?
+        if (user_db.id.toString() !== room_db.user.toString()) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The Room does not belong to the user'
+            });
+        };
+
+        // New Room name exists?
+        const exists = await Room.findOne({ name: new_name });
+        if (exists) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room name already exists'
+            });
+        };
+
+        // Modify Room name
+        room_db.name = new_name;
+        room_db.modified_at = Date.now();
+        await room_db.save();
+
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Room name modified',
+            room: {
+                _id: room_db.id,
+                name: room_db.name
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
 // Modify Room info
 export const modify_room_info = async (req: Request, res: Response) => {
-    //TODO
+
+    const { uid, room_id, new_desc, new_photo } = req.body;
+
+    try {
+        // Main User exists
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // Room exists
+        const room_db = await Room.findById(room_id);
+        if (!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        }
+
+        // Room belongs to main user?
+        if (user_db.id.toString() !== room_db.user.toString()) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The Room does not belong to the user'
+            });
+        };
+
+        // Modify Room info
+        room_db.desc = new_desc;
+        room_db.photo = new_photo;
+        room_db.modified_at = Date.now();
+        await room_db.save();
+
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Room info modified',
+            room: {
+                _id: room_db.id,
+                name: room_db.name,
+                desc: room_db.desc,
+                photo: room_db.photo
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
 // Get All chat rooms
 export const get_all_chat_rooms = async (req: Request, res: Response) => {
     //TODO
+    const { } = req.body;
+
+    try {
+
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
 // Get Main user chat rooms (rooms created by him/her)
 export const get_main_user_chat_rooms = async (req: Request, res: Response) => {
     //TODO
+    const { } = req.body;
+
+    try {
+
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
 }
 
 // Add chat user to chat room

@@ -18,7 +18,9 @@ import {
     create_chat_room, 
     get_room_chat_users, 
     remove_chat_user_chat_room,
-    delete_chat_room 
+    delete_chat_room, 
+    modify_room_name,
+    modify_room_info
 } from './controllers/room';
 
 
@@ -76,6 +78,21 @@ chat_router.post('/create-chat-room', [
     validate_fields,
     validate_jwt
 ], create_chat_room);
+
+chat_router.put('/update-room-name', [
+    check('new_name', 'Name is required and must be unique').isLength({min: 3}),
+    check('room_id', 'Room id is required').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], modify_room_name);
+
+chat_router.put('/update-room-info', [
+    check('new_desc', 'Desc is required').isLength({min: 3}),
+    check('new_photo', 'Photo is required').isLength({min: 3}),
+    check('room_id', 'Room id is required').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], modify_room_info);
 
 chat_router.get('/room-chat-users', [
     check('room_id', 'Room ID is required').isLength({min: 3}),
