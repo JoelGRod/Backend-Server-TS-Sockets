@@ -26,7 +26,11 @@ import {
     get_main_user_chat_rooms
 } from './controllers/room';
 
+import { MessageController } from './controllers/msg'; // Class controller (above alternative)
 
+const msg = new MessageController();
+
+// API Router
 const chat_router = Router();
 
 //////////////////////////////////////////////////////////////////
@@ -140,5 +144,16 @@ chat_router.delete('/delete-chat-room', [
     validate_jwt
 ], delete_chat_room);
 //////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////
+// Message Routes
+//////////////////////////////////////////////////////////////////
+chat_router.post('/message-add', [
+    check('room_id', 'Room Id is required').isLength({min: 3}),
+    check('chatuser_nickname', 'Nickname is required').isLength({min: 3}),
+    check('msg', 'msg is required').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], msg.add_message);
 
 export default chat_router;
