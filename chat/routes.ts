@@ -20,7 +20,8 @@ import {
     remove_chat_user_chat_room,
     delete_chat_room, 
     modify_room_name,
-    modify_room_info
+    modify_room_info,
+    modify_room_password
 } from './controllers/room';
 
 
@@ -93,6 +94,14 @@ chat_router.put('/update-room-info', [
     validate_fields,
     validate_jwt
 ], modify_room_info);
+
+chat_router.put('/update-room-password', [
+    check('new_password', 'New Password is required').isLength({min: 3}),
+    check('old_password', 'Old password is required').isLength({min: 3}),
+    check('room_id', 'Room id is required').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], modify_room_password);
 
 chat_router.get('/room-chat-users', [
     check('room_id', 'Room ID is required').isLength({min: 3}),

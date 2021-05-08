@@ -159,7 +159,7 @@ export const modify_room_info = async (req: Request, res: Response) => {
                 ok: false,
                 msg: 'Room does not exists'
             });
-        }
+        };
 
         // Room belongs to main user?
         if (user_db.id.toString() !== room_db.user.toString()) {
@@ -184,6 +184,71 @@ export const modify_room_info = async (req: Request, res: Response) => {
                 name: room_db.name,
                 desc: room_db.desc,
                 photo: room_db.photo
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
+}
+
+// Modify Room password
+export const modify_room_password = async (req: Request, res: Response) => {
+
+    const { uid, room_id, new_password, old_password } = req.body;
+
+    try {
+        // Main User exists
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // Room exists
+        const room_db = await Room.findById(room_id);
+        if (!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        };
+
+        // Room belongs to main user?
+        if (user_db.id.toString() !== room_db.user.toString()) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The Room does not belong to the user'
+            });
+        };
+
+        // Is the chat room old password correct??
+        const is_correct_password = bcrypt.compareSync(old_password, room_db.password);
+        if (!is_correct_password) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Wrong room old password'
+            });
+        };
+
+        // Modify Room info
+        // Encrypt/hash password
+        const salt = bcrypt.genSaltSync();  // Default 10 rounds
+        room_db.password = bcrypt.hashSync(new_password, salt);
+        room_db.modified_at = Date.now();
+        await room_db.save();
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Room password modified',
+            room: {
+                _id: room_db.id,
+                name: room_db.name
             }
         });
 
