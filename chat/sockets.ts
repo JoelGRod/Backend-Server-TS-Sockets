@@ -27,7 +27,10 @@ export const get_message = (client: Socket, io: socketIO.Server) => {
             if( !resp.ok ) return callback(resp);
             else io.emit(
                 `${resp.message!.room}-new-message`, 
-                { nickname: payload.nickname, msg: payload.msg });
+                { 
+                    nickname: payload.nickname, 
+                    msg: payload.msg 
+                });
         });
         
     });
