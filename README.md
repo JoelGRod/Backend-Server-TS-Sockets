@@ -3,24 +3,22 @@
 # Steps:
     First time:
     npm install (rebuild dependencies)
-    Add .env: PORT=yourporthere
+    Add .env:
+        PORT=yourporthere
+        DB_CNN=db connection here
+        SECRET_JWT_SEED=jsonwebtoken seed here
     Work with:
     tsc --watch (live ts compilator)
     npm run dev (nodemon)
 
 # Server configuration 
-    Base endpoints URLs and express app middlewares:
+    Base endpoints URLs, express app middlewares, routes and sockets:
     index.ts
     server/
 
 # API Endpoints
     https://documenter.getpostman.com/view/7455569/TzJx8bqh
     
-    Auth domain:
-        (POST)  /api/auth/new       (body: name, email, password)
-        (POST)  /api/auth/login     (body: email, password)
-        (GET)   /api/auth/renew     (headers: token)
-    Messages domain:
-        (GET)   /api/msg/
-        (POST)  /api/msg/           (body: from, body)
-        (POST)  /api/msg/:id        (body: from, body; params: id)
+# Sockets
+    Chat Domain sockets: message login-user logout-user
+    Server Domain sockets: disconnect
