@@ -4,6 +4,7 @@ import socketIO from 'socket.io';
 import http from 'http';
 // Sockets events
 import * as socket from './sockets';
+import * as chat_socket from '../chat/sockets';
 // DB connection
 import dbConnection from './db-config';
 // Routes
@@ -76,15 +77,13 @@ export default class Server {
 
             // ALL SOCKETS EVENTS GOES BELOW HERE
 
-            // Login socket user
-            socket.chat_user(client, this.io);
+            // CHAT DOMAIN
             // Messages
-            socket.get_message(client, this.io);
+            chat_socket.get_message(client, this.io);
+            
+            // GRAL DOMAIN
             // Disconnected client
             socket.disconnect(client);
-            // client.on('disconnect', () => {
-            //     console.log("Client disconnected");
-            // });
         });
     }
 

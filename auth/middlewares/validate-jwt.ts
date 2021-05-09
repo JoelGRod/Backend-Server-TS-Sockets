@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
-
-interface UserToken {
-    uid: string,
-    name: string
-}
+// Interfaces
+import { UserToken } from '../interfaces/auth-interfaces';
 
 
 const validate_jwt = (req: Request, res: Response, next: NextFunction) => {
