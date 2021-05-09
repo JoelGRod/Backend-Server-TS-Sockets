@@ -6,6 +6,7 @@ import ChatUser from '../models/chatuser';
 import Message from '../models/msg';
 // Sockets Interfaces
 import { ChatPayload } from "../interfaces/chat-sockets";
+import { it_belongs_to } from "../helpers/chat";
 
 export class MessageController {
 
@@ -98,30 +99,35 @@ export class MessageController {
     }
 
     // Sockets Controllers
-    public add_message_sockets = async ( payload: ChatPayload ) => {
+    public add_message_sockets = async (payload: ChatPayload) => {
         const { room_id, nickname, msg } = payload;
         const { uid } = payload.user_token!;
 
         try {
             // Main User exists?
             const user_db = await User.findById(uid);
-            if (!user_db) 
+            if (!user_db)
                 return { ok: false, msg: 'Invalid main user' };
 
             // Room Exists?
             const room_db = await Room.findById(room_id);
-            if (!room_db) 
+            if (!room_db)
                 return { ok: false, msg: 'Room does not exists' };
 
             // Chat user exists?
             const chatuser_db = await ChatUser.findOne({ nickname });
-            if (!chatuser_db) 
+            if (!chatuser_db)
                 return { ok: false, msg: 'Chat user does not exists' };
 
             // Chat user belongs to main user (token)?
-            if (user_db.id.toString() !== chatuser_db.user.toString()) 
-                return {ok: false, msg: 'The Chat user does not belong to the main user'};
-        
+            if (user_db.id.toString() !== chatuser_db.user.toString())
+                return { ok: false, msg: 'The Chat user does not belong to the main user' };
+
+            // Is chat user in room already?
+            const is_chat_user_in_room = it_belongs_to(room_db.chatusers, chatuser_db.id.toString());
+            if (!is_chat_user_in_room)
+                return { ok: false, msg: 'The chat user is not connected to room' };
+
             // Create message and save in DB
             const message_db = new Message({
                 msg,
