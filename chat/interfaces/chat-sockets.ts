@@ -5,7 +5,8 @@ export interface ChatPayload {
     token: string;
     nickname: string;
     msg?: string;
-    user_token?: UserToken
+    password?: string;
+    user_token?: UserToken;
 }
 
 

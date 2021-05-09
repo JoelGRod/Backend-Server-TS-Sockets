@@ -167,11 +167,6 @@ export class MessageController {
             };
         }
     }
-    
-    public login_user_sockets = async ( payload: ChatPayload ) => {
 
-    }
-    public logout_user_sockets = async ( payload: ChatPayload ) => {
 
-    }
 }

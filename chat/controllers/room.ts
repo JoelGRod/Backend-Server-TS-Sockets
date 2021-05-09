@@ -7,6 +7,8 @@ import Room from '../models/room';
 import ChatUser from '../models/chatuser';
 // Helpers
 import { is_another_user_profile_connected, it_belongs_to } from "../helpers/chat";
+// Interfaces
+import { ChatPayload } from "../interfaces/chat-sockets";
 
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => {
@@ -629,5 +631,155 @@ export const delete_chat_room = async (req: Request, res: Response) => {
             ok: false,
             msg: 'Please contact the administrator'
         });
+    }
+}
+
+// Sockets Controllers
+export const login_user_sockets = async ( payload: ChatPayload ) => {
+    const { room_id, nickname, password } = payload;
+    const { uid } = payload.user_token!;
+    
+    try {
+
+        // Security Validations
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if (!user_db) 
+            return { ok: false, msg: 'Invalid main user' };
+
+        // Room exists?
+        const room_db = await Room.findById(room_id);
+        if (!room_db) 
+            return { ok: false, msg: 'Room does not exists' };
+        
+        // chat user exists
+        const chatuser_db = await ChatUser.findOne({ nickname });
+        if (!chatuser_db) 
+            return { ok: false, msg: 'Chat user does not exists' };
+
+        // Chat user belongs to main user (token)?
+        if (user_db.id.toString() !== chatuser_db.user.toString()) 
+            return { ok: false, msg: 'The Chat user does not belong to the main user' };
+
+        // Is the chat room password correct??
+        const is_correct_password = bcrypt.compareSync(password!, room_db.password);
+        if (!is_correct_password) 
+            return { ok: false, msg: 'Wrong room password' };
+
+        // Is user chat in room already?
+        const is_chat_user_in_room = it_belongs_to(room_db.chatusers, chatuser_db.id.toString());
+        if (is_chat_user_in_room) 
+            return { ok: false, msg: 'The chat user is already connected' };
+
+        // Is another main user chat user connected to room
+        const is_another_main_user_profile_connected = is_another_user_profile_connected(user_db.chatusers, room_db.chatusers);
+        if (is_another_main_user_profile_connected) 
+            return { ok: false, msg: 'The User has another profile connected' };
+        
+        // Add chat user to room
+        // STEP I: Update room_db chat_users array
+        await room_db.updateOne({
+            $push: {
+                chatusers: {
+                    _id: chatuser_db.id
+                }
+            }
+        });
+        // STEP II: Update chat_user_db rooms array
+        await chatuser_db.updateOne({
+            $push: {
+                rooms: {
+                    _id: room_db.id
+                }
+            }
+        });
+
+        return {
+            ok: true,
+            msg: 'chat user connected to room',
+            chatuser: {
+                _id: chatuser_db.id,
+                nickname: chatuser_db.nickname,
+            },
+            room: {
+                _id: room_db.id,
+                name: room_db.name
+            }
+        };
+
+    } catch (error) {
+        return {
+            ok: false,
+            msg: 'Please contact the administrator'
+        };
+    }
+
+}
+
+export const logout_user_sockets = async ( payload: ChatPayload ) => {
+    const { room_id, nickname } = payload;
+    const { uid } = payload.user_token!;
+
+    try {
+        // Security Validations
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if (!user_db) 
+            return { ok: false, msg: 'Invalid main user' };
+
+        // Room exists?
+        const room_db = await Room.findById(room_id);
+        if (!room_db) 
+            return { ok: false, msg: 'Room does not exists' };
+
+        // chat user exists
+        const chatuser_db = await ChatUser.findOne({ nickname });
+        if (!chatuser_db) 
+            return { ok: false, msg: 'Chat user does not exists' };
+
+        // Chat user belongs to main user (token)?
+        if (user_db.id.toString() !== chatuser_db.user.toString()) 
+            return { ok: false, msg: 'The Chat user does not belong to the main user' };
+
+        // Is chat user in room already?
+        const is_chat_user_in_room = it_belongs_to(room_db.chatusers, chatuser_db.id.toString());
+        if (!is_chat_user_in_room) 
+            return { ok: false, msg: 'The chat user is not connected to room' };
+
+        // Remove chat user from Room
+        // STEP I: Remove chat user from Room chat users array
+        const room_chat_users = room_db.chatusers.filter(function (id: String) {
+            return id != chatuser_db.id;
+        });
+        await room_db.updateOne(
+            { chatusers: room_chat_users }
+        );
+
+        // STEP II: Remove room from Chat_user rooms array
+        const chat_user_rooms = chatuser_db.rooms.filter(function (id: String) {
+            return id != room_db.id;
+        });
+        await chatuser_db.updateOne(
+            { rooms: chat_user_rooms }
+        );
+
+        return {
+            ok: true,
+            msg: 'Removed user from room',
+            chatuser: {
+                _id: chatuser_db.id,
+                nickname: chatuser_db.nickname,
+            },
+            room: {
+                _id: room_db.id,
+                name: room_db.name
+            }
+        };
+
+    } catch (error) {
+        return {
+            ok: false,
+            msg: 'Please contact the administrator'
+        };
     }
 }
