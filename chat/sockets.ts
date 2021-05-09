@@ -11,7 +11,7 @@ import { login_user_sockets, logout_user_sockets } from './controllers/room';
 // Messages
 export const get_message = (client: Socket, io: socketIO.Server) => {
     client.on('message', ( payload: ChatPayload, callback ) => {
-        console.log('New message:', payload);
+        // console.log('New message:', payload);
 
         // Middlewares 
         // json web token (AUTH Domain)
