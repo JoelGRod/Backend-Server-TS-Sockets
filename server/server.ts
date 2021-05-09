@@ -80,7 +80,11 @@ export default class Server {
             // CHAT DOMAIN
             // Messages
             chat_socket.get_message(client, this.io);
-            
+            // Room Login
+            chat_socket.room_login(client, this.io);
+            // Room Logout
+            chat_socket.room_logout(client, this.io);
+
             // GRAL DOMAIN
             // Disconnected client
             socket.disconnect(client);

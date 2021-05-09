@@ -6,6 +6,7 @@ import { ChatPayload } from './interfaces/chat-sockets';
 import validate_jwt_sockets from '../auth/middlewares/validate-jwt-sockets';
 // Controllers
 import { MessageController } from './controllers/msg';
+import { login_user_sockets, logout_user_sockets } from './controllers/room';
 
 // Messages
 export const get_message = (client: Socket, io: socketIO.Server) => {
@@ -14,8 +15,7 @@ export const get_message = (client: Socket, io: socketIO.Server) => {
 
         // Middlewares 
         // json web token (AUTH Domain)
-        const user_token = validate_jwt_sockets(payload.token);
-        payload.user_token = user_token;
+        payload.user_token = validate_jwt_sockets(payload.token);
         if(!payload.user_token) return callback({ ok: false, msg: 'Invalid token' });
 
         // Controllers
@@ -26,7 +26,7 @@ export const get_message = (client: Socket, io: socketIO.Server) => {
         controller_response.then( resp => {
             if( !resp.ok ) return callback(resp);
             else io.emit(
-                `${resp.message?.room}-new-message`, 
+                `${resp.message!.room}-new-message`, 
                 { nickname: payload.nickname, msg: payload.msg });
         });
         
@@ -36,32 +36,52 @@ export const get_message = (client: Socket, io: socketIO.Server) => {
 // Room
 export const room_login = (client: Socket, io: socketIO.Server) => {
     client.on('login-user', ( payload: ChatPayload, callback: Function ) => {
-        console.log(payload.token, payload.room_id);
-        // TODO
-        // Middlewares (jwtoken)
+        // console.log(payload.token, payload.room_id);
+
+        // Middlewares 
+        // json web token (AUTH Domain)
+        payload.user_token = validate_jwt_sockets(payload.token);
+        if(!payload.user_token) return callback({ ok: false, msg: 'Invalid token' });
+        
         // Controllers
-        // Callback
-        // New event send
-        // Use this if you want a response from server
-        callback ({
-            resp: 'ok',
-            msg: 'User logged'
-        })
+        const controller_response = login_user_sockets(payload);
+        // Callback and emit
+        controller_response.then( resp => {
+            if( !resp.ok ) return callback(resp);
+            else {
+                callback(resp);
+                io.emit(
+                    `${resp.room!.name}-login-user`, 
+                    { 
+                        nickname: resp.chatuser!.nickname, 
+                        desc: resp.chatuser?.desc, 
+                        photo: resp.chatuser?.photo 
+                    });
+            }; 
+        });
     })
 }
 
 export const room_logout = (client: Socket, io: socketIO.Server) => {
     client.on('logout-user', ( payload: ChatPayload, callback ) => {
-        console.log(payload.token, payload.room_id);
-        // TODO
-        // Middlewares (jwtoken)
+        // console.log(payload.token, payload.room_id);
+
+        // Middlewares 
+        // json web token (AUTH Domain)
+        payload.user_token = validate_jwt_sockets(payload.token);
+        if(!payload.user_token) return callback({ ok: false, msg: 'Invalid token' });
+        
         // Controllers
-        // Callback
-        // New event send
-        // Use this if you want a response from server
-        callback = {
-            resp: 'ok',
-            msg: 'User logged'
-        }
+        const controller_response = logout_user_sockets(payload);
+        // Callback and emit
+        controller_response.then( resp => {
+            if( !resp.ok ) return callback(resp);
+            else {
+                callback(resp);
+                io.emit(
+                    `${resp.room!.name}-login-user`, 
+                    { nickname: resp.chatuser!.nickname });
+            }; 
+        });
     })
 }

@@ -700,6 +700,8 @@ export const login_user_sockets = async ( payload: ChatPayload ) => {
             chatuser: {
                 _id: chatuser_db.id,
                 nickname: chatuser_db.nickname,
+                desc: chatuser_db.desc,
+                photo: chatuser_db.photo
             },
             room: {
                 _id: room_db.id,
@@ -768,7 +770,7 @@ export const logout_user_sockets = async ( payload: ChatPayload ) => {
             msg: 'Removed user from room',
             chatuser: {
                 _id: chatuser_db.id,
-                nickname: chatuser_db.nickname,
+                nickname: chatuser_db.nickname
             },
             room: {
                 _id: room_db.id,
