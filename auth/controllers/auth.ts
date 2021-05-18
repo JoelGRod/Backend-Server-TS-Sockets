@@ -106,7 +106,9 @@ export const renew_token = async ( req: Request, res: Response ) => {
 
     try {
         // User exists? (email)
-        const user_db = await User.findById(uid);
+        const user_db = await User.findById(uid)
+            .populate('rooms','-__v -password -msgs -chatusers -user')
+            .populate('chatusers', '-msgs -__v -user');
         if(!user_db) {
             return res.status(400).json({
                 ok: false,
@@ -122,7 +124,9 @@ export const renew_token = async ( req: Request, res: Response ) => {
             uid: user_db.id,
             name: user_db.name,
             email: user_db.email,
-            token: token
+            token: token,
+            rooms: user_db.rooms,
+            profiles: user_db.chatusers
         });
 
     } catch (error) {
