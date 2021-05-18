@@ -265,7 +265,7 @@ export const modify_room_password = async (req: Request, res: Response) => {
 // Get All chat rooms
 export const get_all_chat_rooms = async (req: Request, res: Response) => {
     try {
-        const rooms = await Room.find({}, { name: 1, desc: 1, photo: 1 });
+        const rooms = await Room.find({}, { name: 1, desc: 1, photo: 1, created_at: 1 });
 
         return res.status(200).json({
             ok: true,
