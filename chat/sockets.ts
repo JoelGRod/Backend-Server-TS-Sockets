@@ -108,11 +108,12 @@ export const room_create = (client: Socket, io: socketIO.Server) => {
                 io.emit(
                     `new-room-created`, 
                     { 
-                        id: resp.room!._id,
+                        _id: resp.room!._id,
                         name: resp.room!.name,
                         desc: resp.room!.desc,
                         photo: resp.room!.photo,
-                        has_password: resp.room!.has_password, 
+                        has_password: resp.room!.has_password,
+                        created_at: resp.room!.created_at
                     }
                 );
             }; 
