@@ -1,12 +1,12 @@
 import { Socket } from 'socket.io';
 import socketIO from 'socket.io';
 // Chat Sockets Interfaces
-import { ChatPayload } from './interfaces/chat-sockets';
+import { ChatPayload, RoomPayload } from './interfaces/chat-sockets';
 // Middlewares
 import validate_jwt_sockets from '../auth/middlewares/validate-jwt-sockets';
 // Controllers
 import { MessageController } from './controllers/msg';
-import { login_user_sockets, logout_user_sockets } from './controllers/room';
+import { login_user_sockets, logout_user_sockets, create_chat_room_sockets } from './controllers/room';
 
 // Messages
 export const get_message = (client: Socket, io: socketIO.Server) => {
@@ -84,6 +84,37 @@ export const room_logout = (client: Socket, io: socketIO.Server) => {
                 io.emit(
                     `${resp.room!.name}-login-user`, 
                     { nickname: resp.chatuser!.nickname });
+            }; 
+        });
+    })
+}
+
+export const room_create = (client: Socket, io: socketIO.Server) => {
+    client.on('create-room', ( payload: RoomPayload, callback ) => {
+        // console.log(payload.token, payload.room_id);
+
+        // Middlewares 
+        // json web token (AUTH Domain)
+        payload.user_token = validate_jwt_sockets(payload.token);
+        if(!payload.user_token) return callback({ ok: false, msg: 'Invalid token' });
+        
+        // Controllers
+        const controller_response = create_chat_room_sockets(payload);
+        // Callback and emit
+        controller_response.then( resp => {
+            if( !resp.ok ) return callback(resp);
+            else {
+                callback(resp);
+                io.emit(
+                    `new-room-created`, 
+                    { 
+                        id: resp.room!._id,
+                        name: resp.room!.name,
+                        desc: resp.room!.desc,
+                        photo: resp.room!.photo,
+                        has_password: resp.room!.has_password, 
+                    }
+                );
             }; 
         });
     })

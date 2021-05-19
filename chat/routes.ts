@@ -81,7 +81,8 @@ chat_router.post('/create-chat-room', [
     check('room_name', 'name is required and must be unique').isLength({min: 3}),
     check('desc', 'desc or no desc msg is required').isLength({min: 3}),
     check('photo', 'photo url or no photo msg is required').isLength({min: 3}),
-    check('password', 'password or no password msg is required').isLength({min: 3}),
+    check('has_password', 'has password is required'),
+    check('password', 'password or empty password is required'),
     validate_fields,
     validate_jwt
 ], create_chat_room);

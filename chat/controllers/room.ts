@@ -8,12 +8,12 @@ import ChatUser from '../models/chatuser';
 // Helpers
 import { is_another_user_profile_connected, it_belongs_to } from "../helpers/chat";
 // Interfaces
-import { ChatPayload } from "../interfaces/chat-sockets";
+import { ChatPayload, RoomPayload } from '../interfaces/chat-sockets';
 
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => {
 
-    const { room_name, desc, photo, password, uid } = req.body;
+    const { room_name, desc, photo, has_password, password, uid } = req.body;
     try {
         // Room name exists?
         const room = await Room.findOne({ name: room_name });
@@ -31,20 +31,25 @@ export const create_chat_room = async (req: Request, res: Response) => {
                 ok: false,
                 msg: 'Invalid main user'
             });
-        }
+        };
 
         // Create chat room
         const room_db = new Room({
             name: room_name,
             desc,
             photo,
+            has_password,
             password,
             created_at: Date.now(),
             user: user_db.id
         });
-        // Encrypt/hash password
-        const salt = bcrypt.genSaltSync();  // Default 10 rounds
-        room_db.password = bcrypt.hashSync(password, salt);
+
+        if( room_db.has_password ) {
+            // Encrypt/hash password
+            const salt = bcrypt.genSaltSync();  // Default 10 rounds
+            room_db.password = bcrypt.hashSync(password, salt);
+        }
+
         // Save chat user in db
         await room_db.save();
         // Update user_db chat_users array
@@ -65,6 +70,7 @@ export const create_chat_room = async (req: Request, res: Response) => {
                 name: room_db.name,
                 desc: room_db.desc,
                 photo: room_db.photo,
+                has_password: room_db.has_password,
                 created_at: room_db.created_at
             }
         });
@@ -72,7 +78,8 @@ export const create_chat_room = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(500).json({
             ok: false,
-            msg: 'Please contact the administrator'
+            msg: 'Please contact the administrator',
+            error
         });
     }
 }
@@ -783,5 +790,71 @@ export const logout_user_sockets = async ( payload: ChatPayload ) => {
             ok: false,
             msg: 'Please contact the administrator'
         };
+    }
+}
+
+// Create Chat Room
+export const create_chat_room_sockets = async ( payload: RoomPayload ) => {
+
+    const { room_name, desc, photo, has_password, password } = payload;
+    const { uid } = payload.user_token!;
+
+    try {
+        // Room name exists?
+        const room = await Room.findOne({ name: room_name });
+        if (room) {
+            return { ok: false, msg: 'Room name already exists' };
+        };
+
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return { ok: false, msg: 'Invalid main user' };
+        };
+
+        // Create chat room
+        const room_db = new Room({
+            name: room_name,
+            desc,
+            photo,
+            has_password,
+            password,
+            created_at: Date.now(),
+            user: user_db.id
+        });
+
+        if( room_db.has_password ) {
+            // Encrypt/hash password
+            const salt = bcrypt.genSaltSync();  // Default 10 rounds
+            room_db.password = bcrypt.hashSync(password, salt);
+        }
+
+        // Save chat user in db
+        await room_db.save();
+        // Update user_db chat_users array
+        await user_db.updateOne({
+            $push: {
+                rooms: {
+                    _id: room_db.id
+                }
+            }
+        });
+
+        // Succesful response
+        return {
+            ok: true,
+            msg: 'room created',
+            room: {
+                _id: room_db.id,
+                name: room_db.name,
+                desc: room_db.desc,
+                photo: room_db.photo,
+                has_password: room_db.has_password,
+                created_at: room_db.created_at
+            }
+        };
+
+    } catch (error) {
+        return { ok: false, msg: 'Please contact the administrator' };
     }
 }

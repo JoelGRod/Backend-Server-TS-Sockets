@@ -14,6 +14,10 @@ const RoomSchema = new Schema({
         type: String,
         required: true
     },
+    has_password: {
+        type: Boolean,
+        required: true
+    },
     password: {
         type: String,
         required: false
