@@ -50,7 +50,8 @@ export const create_chat_user = async (req: Request, res: Response ) => {
         return res.status(200).json({
             ok: true,
             msg: `Chat User ${nickname} added`,
-            chatuser: {
+            profile: {
+                rooms: chat_user_db.rooms,
                 _id: chat_user_db.id,
                 nickname: chat_user_db.nickname,
                 desc: chat_user_db.desc,
