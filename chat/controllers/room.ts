@@ -8,7 +8,7 @@ import ChatUser from '../models/chatuser';
 // Helpers
 import { is_another_user_profile_connected, it_belongs_to } from "../helpers/chat";
 // Interfaces
-import { ChatPayload, RoomPayload } from '../interfaces/chat-sockets';
+import { ChatPayload, DeleteRoomPayload, RoomPayload } from '../interfaces/chat-sockets';
 
 /* ------------------------ HTTP CONTROLLERS -------------------------------- */
 // Create Chat Room
@@ -799,7 +799,6 @@ export const logout_user_sockets = async ( payload: ChatPayload ) => {
     }
 }
 
-// Create Chat Room
 export const create_chat_room_sockets = async ( payload: RoomPayload ) => {
 
     const { room_name, desc, photo, has_password, password } = payload;
@@ -850,6 +849,76 @@ export const create_chat_room_sockets = async ( payload: RoomPayload ) => {
         return {
             ok: true,
             msg: 'room created',
+            room: {
+                _id: room_db.id,
+                name: room_db.name,
+                desc: room_db.desc,
+                photo: room_db.photo,
+                has_password: room_db.has_password,
+                created_at: room_db.created_at
+            }
+        };
+
+    } catch (error) {
+        return { ok: false, msg: 'Please contact the administrator' };
+    }
+}
+
+export const delete_chat_room_sockets = async ( payload: DeleteRoomPayload ) => {
+
+    const { uid } = payload.user_token!;
+    const { room_id } = payload;
+    try {
+        // Security Validations
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return { ok: false, msg: 'Invalid main user' };
+        };
+
+        // Room exists
+        const room_db = await Room.findById(room_id);
+        if (!room_db) {
+            return { ok: false, msg: 'Room does not exists' };
+        };
+
+        // Room belongs to main user? is main user the creator?
+        const is_room_valid = it_belongs_to(user_db.rooms, room_db.id);
+        if (!is_room_valid) {
+            return { ok: false, msg: 'The Room does not belong to the main user' };
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // STEP I: Delete chat room from every chat_user rooms array
+        const connected_users = room_db.chatusers;
+        for (let chat_user_id of connected_users) {
+            const chat_user_db = await ChatUser.findById(chat_user_id);
+            const chat_user_rooms = chat_user_db.rooms.filter((id: String) => {
+                return id != room_id;
+            });
+            await chat_user_db.updateOne(
+                { rooms: chat_user_rooms }
+            );
+        };
+        ///////////////////////////////////////////////////////////////////////
+
+        // STEP II: Delete room from User
+        const user_rooms = user_db.rooms.filter((id: String) => {
+            return id != room_id;
+        });
+        await user_db.updateOne(
+            { rooms: user_rooms }
+        );
+
+        // STEP III: Delete room
+        await Room.deleteOne(
+            { _id: room_id },
+            { new: true }
+        );
+
+        return {
+            ok: true,
+            msg: 'room deleted',
             room: {
                 _id: room_db.id,
                 name: room_db.name,

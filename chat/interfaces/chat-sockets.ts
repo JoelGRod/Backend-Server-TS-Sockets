@@ -22,4 +22,10 @@ export interface RoomPayload {
     user_token?: UserToken;
 }
 
+export interface DeleteRoomPayload {
+    room_id: string;
+    token: string;
+    user_token?: UserToken;
+}
+
 
