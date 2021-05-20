@@ -10,6 +10,7 @@ import { is_another_user_profile_connected, it_belongs_to } from "../helpers/cha
 // Interfaces
 import { ChatPayload, RoomPayload } from '../interfaces/chat-sockets';
 
+/* ------------------------ HTTP CONTROLLERS -------------------------------- */
 // Create Chat Room
 export const create_chat_room = async (req: Request, res: Response) => {
 
@@ -561,7 +562,8 @@ export const get_room_chat_users = async (req: Request, res: Response) => {
 // Delete chat room
 export const delete_chat_room = async (req: Request, res: Response) => {
 
-    const { uid, room_id } = req.body;
+    const { uid } = req.body;
+    const { room_id } = req.query;
     try {
         // Security Validations
         // Main User exists?
@@ -583,7 +585,7 @@ export const delete_chat_room = async (req: Request, res: Response) => {
         };
 
         // Room belongs to main user? is main user the creator?
-        const is_room_valid = it_belongs_to(user_db.rooms, room_id);
+        const is_room_valid = it_belongs_to(user_db.rooms, room_db.id);
         if (!is_room_valid) {
             return res.status(400).json({
                 ok: false,
@@ -629,7 +631,11 @@ export const delete_chat_room = async (req: Request, res: Response) => {
             msg: 'room deleted',
             room: {
                 _id: room_db.id,
-                name: room_db.name
+                name: room_db.name,
+                desc: room_db.desc,
+                photo: room_db.photo,
+                has_password: room_db.has_password,
+                created_at: room_db.created_at
             }
         });
 
@@ -641,7 +647,7 @@ export const delete_chat_room = async (req: Request, res: Response) => {
     }
 }
 
-// Sockets Controllers
+/* ------------------------ SOCKETS CONTROLLERS -------------------------------- */
 export const login_user_sockets = async ( payload: ChatPayload ) => {
     const { room_id, nickname, password } = payload;
     const { uid } = payload.user_token!;
