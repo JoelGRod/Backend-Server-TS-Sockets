@@ -84,6 +84,8 @@ export default class Server {
             chat_socket.room_logout(client, this.io);
             // Room create
             chat_socket.room_create(client, this.io);
+            // Room delete
+            chat_socket.room_delete(client, this.io);
 
             // GRAL DOMAIN
             // Disconnected client
