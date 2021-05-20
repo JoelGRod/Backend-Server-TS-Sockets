@@ -1,12 +1,12 @@
 import { Socket } from 'socket.io';
 import socketIO from 'socket.io';
 // Chat Sockets Interfaces
-import { ChatPayload, RoomPayload } from './interfaces/chat-sockets';
+import { ChatPayload, DeleteRoomPayload, RoomPayload } from './interfaces/chat-sockets';
 // Middlewares
 import validate_jwt_sockets from '../auth/middlewares/validate-jwt-sockets';
 // Controllers
 import { MessageController } from './controllers/msg';
-import { login_user_sockets, logout_user_sockets, create_chat_room_sockets } from './controllers/room';
+import { login_user_sockets, logout_user_sockets, create_chat_room_sockets, delete_chat_room_sockets } from './controllers/room';
 
 // Messages
 export const get_message = (client: Socket, io: socketIO.Server) => {
@@ -82,7 +82,7 @@ export const room_logout = (client: Socket, io: socketIO.Server) => {
             else {
                 callback(resp);
                 io.emit(
-                    `${resp.room!.name}-login-user`, 
+                    `${resp.room!.name}-logout-user`, 
                     { nickname: resp.chatuser!.nickname });
             }; 
         });
@@ -107,6 +107,38 @@ export const room_create = (client: Socket, io: socketIO.Server) => {
                 callback(resp);
                 io.emit(
                     `new-room-created`, 
+                    { 
+                        _id: resp.room!._id,
+                        name: resp.room!.name,
+                        desc: resp.room!.desc,
+                        photo: resp.room!.photo,
+                        has_password: resp.room!.has_password,
+                        created_at: resp.room!.created_at
+                    }
+                );
+            }; 
+        });
+    })
+}
+
+export const room_delete = (client: Socket, io: socketIO.Server) => {
+    client.on('delete-room', ( payload: DeleteRoomPayload, callback ) => {
+        // console.log(payload.token, payload.room_id);
+
+        // Middlewares 
+        // json web token (AUTH Domain)
+        payload.user_token = validate_jwt_sockets(payload.token);
+        if(!payload.user_token) return callback({ ok: false, msg: 'Invalid token' });
+        
+        // Controllers
+        const controller_response = delete_chat_room_sockets(payload);
+        // Callback and emit
+        controller_response.then( resp => {
+            if( !resp.ok ) return callback(resp);
+            else {
+                callback(resp);
+                io.emit(
+                    `room-deleted`, 
                     { 
                         _id: resp.room!._id,
                         name: resp.room!.name,
