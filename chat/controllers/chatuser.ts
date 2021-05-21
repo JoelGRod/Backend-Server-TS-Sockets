@@ -303,7 +303,7 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         return res.status(200).json({
             ok: true,
             msg: 'delete chat user',
-            chatuser: {
+            profile: {
                 _id: chat_user_db.id,
                 nickname: chat_user_db.nickname
             }
