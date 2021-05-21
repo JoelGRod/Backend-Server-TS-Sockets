@@ -362,12 +362,14 @@ export const add_chat_user_chat_room = async (req: Request, res: Response) => {
         }
 
         // Is the chat room password correct??
-        const is_correct_password = bcrypt.compareSync(room_password, room_db.password);
-        if (!is_correct_password) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Wrong room password'
-            });
+        if(room_db.has_password) {
+            const is_correct_password = bcrypt.compareSync(room_password, room_db.password);
+            if (!is_correct_password) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Wrong room password'
+                });
+            }
         }
 
         // Is user chat in room already?

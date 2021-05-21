@@ -127,7 +127,7 @@ chat_router.get('/rooms-user', [
 chat_router.put('/add-chat-user-to-room', [
     check('room_id', 'Room ID is required').isLength({min: 3}),
     check('chat_user_id', 'Chat User ID is required').isLength({min: 3}),
-    check('room_password', 'Room password is required').isLength({min: 3}),
+    check('room_password', 'Room password is required').isLength({min: 0}),
     validate_fields,
     validate_jwt
 ], add_chat_user_chat_room);
