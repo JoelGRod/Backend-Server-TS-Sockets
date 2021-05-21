@@ -273,7 +273,7 @@ export const modify_room_password = async (req: Request, res: Response) => {
 // Get All chat rooms
 export const get_all_chat_rooms = async (req: Request, res: Response) => {
     try {
-        const rooms = await Room.find({}, { name: 1, desc: 1, photo: 1, created_at: 1 });
+        const rooms = await Room.find({}, { name: 1, desc: 1, photo: 1, created_at: 1, has_password: 1 });
 
         return res.status(200).json({
             ok: true,
@@ -677,9 +677,11 @@ export const login_user_sockets = async ( payload: ChatPayload ) => {
             return { ok: false, msg: 'The Chat user does not belong to the main user' };
 
         // Is the chat room password correct??
-        const is_correct_password = bcrypt.compareSync(password!, room_db.password);
-        if (!is_correct_password) 
-            return { ok: false, msg: 'Wrong room password' };
+        if(room_db.has_password) {
+            const is_correct_password = bcrypt.compareSync(password!, room_db.password);
+            if (!is_correct_password) 
+                return { ok: false, msg: 'Wrong room password' };
+        }
 
         // Is user chat in room already?
         const is_chat_user_in_room = it_belongs_to(room_db.chatusers, chatuser_db.id.toString());
