@@ -237,7 +237,8 @@ export const get_user_chat_users = async (req: Request, res: Response) => {
 // Delete one specific chat user
 export const delete_chat_user = async (req: Request, res: Response) => { 
 
-    const { uid, chat_user_id } = req.body;
+    const { uid } = req.body;
+    const { chat_user_id } = req.query;
     try {
         // Main User exists?
         const user_db = await User.findById(uid);
@@ -258,7 +259,7 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         };
 
         // chat_user belongs to main user?
-        const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_id);
+        const is_chat_user_valid = it_belongs_to(user_db.chatusers, chat_user_db.id);
         if(!is_chat_user_valid) {
             return res.status(400).json({
                 ok: false,
@@ -285,7 +286,7 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         };
         ///////////////////////////////////////////////////////////////////////
 
-        // SETEP II: Delete chat user from User
+        // STEP II: Delete chat user from User
         const user_chat_users = user_db.chatusers.filter((id: String) => {
             return id != chat_user_id;
         });
