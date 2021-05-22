@@ -212,7 +212,7 @@ export const get_user_chat_users = async (req: Request, res: Response) => {
     const { uid } = req.body;
     try {
         // Main User exists?
-        const exclusions = "-__v -rooms -msgs";
+        const exclusions = "-__v -msgs -user";
         const user_db = await User.findById(uid).populate('chatusers', exclusions);
         if(!user_db) {
             return res.status(400).json({
@@ -224,7 +224,7 @@ export const get_user_chat_users = async (req: Request, res: Response) => {
         return res.status(200).json({
             ok: true,
             msg: 'get user chat users',
-            chatusers: user_db.chatusers
+            profiles: user_db.chatusers
         });
     } catch (error) {
         return res.status(500).json({
