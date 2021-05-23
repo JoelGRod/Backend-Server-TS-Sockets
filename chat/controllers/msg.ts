@@ -161,7 +161,7 @@ export class MessageController {
                 message: {
                     _id: message_db.id,
                     msg: message_db.msg,
-                    room: room_db.name,
+                    room: room_db.id,
                     chatuser: chatuser_db.nickname
                 }
             };
