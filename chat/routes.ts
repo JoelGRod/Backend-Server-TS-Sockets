@@ -23,7 +23,8 @@ import {
     modify_room_info,
     modify_room_password,
     get_all_chat_rooms,
-    get_main_user_chat_rooms
+    get_main_user_chat_rooms,
+    get_specific_chat_room
 } from './controllers/room';
 
 import { MessageController } from './controllers/msg'; // Class controller (above alternative)
@@ -115,6 +116,12 @@ chat_router.get('/room-chat-users', [
     validate_fields,
     validate_jwt
 ], get_room_chat_users);
+
+chat_router.get('/room', [
+    check('room_id', 'Room ID is required').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], get_specific_chat_room);
 
 chat_router.get('/rooms', [
     validate_jwt

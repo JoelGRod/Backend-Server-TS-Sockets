@@ -649,6 +649,58 @@ export const delete_chat_room = async (req: Request, res: Response) => {
     }
 }
 
+// Get specific chat room
+export const get_specific_chat_room = async (req: Request, res: Response) => {
+
+    const { uid } = req.body;
+    const { room_id } = req.query;
+
+    try {
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // Room exists? and populate chatusers from room
+        const chatusers_exc: string = '-rooms -msgs -created_at -modified_at -user -__v';
+        const msgs_exc: string = '-room -__v';
+
+        const room_db = await Room.findById(room_id)
+            .populate('chatusers', chatusers_exc)
+            .populate('msgs', msgs_exc);
+        if (!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Get Room',
+            room: {
+                profiles: room_db.chatusers,
+                msgs: room_db.msgs,
+                _id: room_db.id,
+                name: room_db.name,
+                desc: room_db.desc,
+                photo: room_db.photo,
+                has_password: room_db.has_password,
+                created_at: room_db.created_at
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
+}
+
 /* ------------------------ SOCKETS CONTROLLERS -------------------------------- */
 export const login_user_sockets = async ( payload: ChatPayload ) => {
     const { room_id, nickname, password } = payload;
