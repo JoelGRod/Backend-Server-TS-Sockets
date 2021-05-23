@@ -671,7 +671,14 @@ export const get_specific_chat_room = async (req: Request, res: Response) => {
 
         const room_db = await Room.findById(room_id)
             .populate('chatusers', chatusers_exc)
-            .populate('msgs', msgs_exc);
+            .populate({
+                path: 'msgs',
+                select: '_id msg created_at chatuser',
+                populate: {
+                    path: 'chatuser',
+                    select: 'nickname'
+                }
+            });
         if (!room_db) {
             return res.status(400).json({
                 ok: false,
