@@ -166,7 +166,7 @@ chat_router.delete('/delete-chat-room', [
 chat_router.post('/message-add', [
     check('room_id', 'Room Id is required').isLength({min: 3}),
     check('chatuser_nickname', 'Nickname is required').isLength({min: 3}),
-    check('msg', 'msg is required').isLength({min: 3}),
+    check('msg', 'msg is required').isLength({min: 1}),
     validate_fields,
     validate_jwt
 ], msg.add_message);
