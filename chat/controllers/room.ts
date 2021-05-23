@@ -666,7 +666,7 @@ export const get_specific_chat_room = async (req: Request, res: Response) => {
         };
 
         // Room exists? and populate chatusers from room
-        const chatusers_exc: string = '-rooms -msgs -created_at -modified_at -user -__v';
+        const chatusers_exc: string = '-rooms -msgs -modified_at -user -__v';
         const msgs_exc: string = '-room -__v';
 
         const room_db = await Room.findById(room_id)
