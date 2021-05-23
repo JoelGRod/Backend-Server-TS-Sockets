@@ -10,7 +10,8 @@ import {
     get_all_chat_users, 
     get_user_chat_users, 
     update_chat_user_info, 
-    update_chat_user_nickname 
+    update_chat_user_nickname,
+    get_specific_chat_user
 } from './controllers/chatuser';
 
 import { 
@@ -63,6 +64,12 @@ chat_router.put('/update-chat-user-info', [
 chat_router.get('/chat-users', [
     validate_jwt
 ], get_all_chat_users);
+
+chat_router.get('/chat-user', [
+    check('profile_id', 'Profile ID is required').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], get_specific_chat_user);
 
 chat_router.get('/user-chat-users', [
     validate_jwt

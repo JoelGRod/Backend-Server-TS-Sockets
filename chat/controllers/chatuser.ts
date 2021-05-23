@@ -317,3 +317,42 @@ export const delete_chat_user = async (req: Request, res: Response) => {
     }
 }
 
+// Get specific profile
+export const get_specific_chat_user = async (req: Request, res: Response) => {
+
+    const { uid } = req.body;
+    const { profile_id } = req.query;
+
+    try {
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // chatuserexists? and populate chatusers from room
+
+        const chatuser_db = await ChatUser.findById(profile_id, {nickname: 1, desc: 1, photo: 1});
+        if (!chatuser_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Profile does not exists'
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Get Profile',
+            profile: chatuser_db 
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
+}
+
