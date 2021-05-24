@@ -853,7 +853,8 @@ export const login_user_sockets = async ( payload: ChatPayload ) => {
                 _id: chatuser_db.id,
                 nickname: chatuser_db.nickname,
                 desc: chatuser_db.desc,
-                photo: chatuser_db.photo
+                photo: chatuser_db.photo,
+                created_at: chatuser_db.created_at
             },
             room: {
                 _id: room_db.id,

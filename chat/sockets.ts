@@ -63,9 +63,11 @@ export const room_login = (client: Socket, io: socketIO.Server) => {
                 io.emit(
                     `${resp.room!._id}-login-user`,
                     {
+                        _id: resp.chatuser!._id,
                         nickname: resp.chatuser!.nickname,
                         desc: resp.chatuser?.desc,
-                        photo: resp.chatuser?.photo
+                        photo: resp.chatuser?.photo,
+                        created_at: resp.chatuser?.created_at
                     });
             };
         });
