@@ -25,8 +25,8 @@ export const get_message = (client: Socket, io: socketIO.Server) => {
         // Callback and emit
         controller_response.then(resp => {
             if (!resp.ok) return callback(resp);
-            else io.emit(
-                `${resp.message!.room}-new-message`,
+            else {
+                io.emit( `${resp.message!.room}-new-message`,
                 {
                     _id: resp.message?._id,
                     msg: resp.message?.msg,
@@ -36,6 +36,8 @@ export const get_message = (client: Socket, io: socketIO.Server) => {
                         nickname: resp.message?.chatuser.nickname
                     }
                 });
+                return callback(resp);
+            }
         });
 
     });
