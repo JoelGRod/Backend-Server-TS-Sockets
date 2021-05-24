@@ -971,8 +971,15 @@ export const delete_chat_room_sockets = async ( payload: DeleteRoomPayload ) => 
             const chat_user_rooms = chat_user_db.rooms.filter((id: String) => {
                 return id != room_id;
             });
+
+            // Delete room msgs from chat user msgs
+            for(let msg of room_db.msgs) {
+                const id: number = chat_user_db.msgs.indexOf(msg);
+                if(id !== -1) chat_user_db.msgs.splice(id, 1); 
+            };
+
             await chat_user_db.updateOne(
-                { rooms: chat_user_rooms }
+                { rooms: chat_user_rooms, msgs: chat_user_db.msgs }
             );
         };
         ///////////////////////////////////////////////////////////////////////
@@ -984,6 +991,11 @@ export const delete_chat_room_sockets = async ( payload: DeleteRoomPayload ) => 
         await user_db.updateOne(
             { rooms: user_rooms }
         );
+
+        // STEP III: Delete room msgs from Msg
+        for(let msg of room_db.msgs) {
+            await Msg.findByIdAndDelete(msg);
+        };
 
         // STEP III: Delete room
         await Room.deleteOne(
