@@ -90,7 +90,7 @@ export const update_chat_user_nickname = async (req: Request, res: Response) => 
                 ok: false,
                 msg: 'The chat user does not belong to the user'
             });
-        }
+        };
 
         // New Nickname exists?
         const chat_user = await ChatUser.findOne({nickname: new_nickname});

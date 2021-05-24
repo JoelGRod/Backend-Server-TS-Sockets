@@ -720,6 +720,70 @@ export const get_specific_chat_room = async (req: Request, res: Response) => {
     }
 }
 
+// Does the user have the proper permission to enter?
+export const check_if_user_can_enter = async (req: Request, res: Response ) => {
+    const { uid } = req.body;
+    const { room_id, profile_id } = req.query;
+
+    try {
+        // Main User exists?
+        const user_db = await User.findById(uid);
+        if (!user_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Invalid main user'
+            });
+        };
+
+        // Room exists?
+        const room_db = await Room.findById(room_id);
+        if (!room_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Room does not exists'
+            });
+        };
+
+        // profile exists?
+        const profile_db = await ChatUser.findById(profile_id);
+        if (!profile_db) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Profile does not exists'
+            });
+        };
+
+        // chat_user belongs to main user?
+        const is_chat_user_valid = it_belongs_to(user_db.chatusers, profile_db.id);
+        if(!is_chat_user_valid) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The chat user does not belong to the user'
+            });
+        };
+        
+        // is profile logged in room?
+        const is_chat_user_logged = it_belongs_to(room_db.chatusers, profile_db.id);
+        if(!is_chat_user_logged) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'The chat user is not logged in!!'
+            });
+        };
+
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Profile can enter the room'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Please contact the administrator'
+        });
+    }
+}
+
 /* ------------------------ SOCKETS CONTROLLERS -------------------------------- */
 export const login_user_sockets = async ( payload: ChatPayload ) => {
     const { room_id, nickname, password } = payload;

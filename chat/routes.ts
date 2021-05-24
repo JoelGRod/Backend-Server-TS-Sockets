@@ -25,7 +25,8 @@ import {
     modify_room_password,
     get_all_chat_rooms,
     get_main_user_chat_rooms,
-    get_specific_chat_room
+    get_specific_chat_room,
+    check_if_user_can_enter
 } from './controllers/room';
 
 import { MessageController } from './controllers/msg'; // Class controller (above alternative)
@@ -158,6 +159,13 @@ chat_router.delete('/delete-chat-room', [
     validate_fields,
     validate_jwt
 ], delete_chat_room);
+
+chat_router.get('/check-room-login', [
+    check('room_id', 'Room ID is required').isLength({min: 3}),
+    check('profile_id', 'Room ID is required').isLength({min: 3}),
+    validate_fields,
+    validate_jwt
+], check_if_user_can_enter);
 //////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////
