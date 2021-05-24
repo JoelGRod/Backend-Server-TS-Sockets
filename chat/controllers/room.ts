@@ -771,11 +771,11 @@ export const check_if_user_can_enter = async (req: Request, res: Response ) => {
             });
         };
 
-
         return res.status(200).json({
             ok: true,
             msg: 'Profile can enter the room'
         });
+        
     } catch (error) {
         return res.status(500).json({
             ok: false,
