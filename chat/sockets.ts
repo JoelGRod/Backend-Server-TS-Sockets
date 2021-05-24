@@ -89,7 +89,7 @@ export const room_logout = (client: Socket, io: socketIO.Server) => {
             else {
                 callback(resp);
                 io.emit(
-                    `${resp.room!.name}-logout-user`,
+                    `${resp.room!._id}-logout-user`,
                     { nickname: resp.chatuser!.nickname });
             };
         });

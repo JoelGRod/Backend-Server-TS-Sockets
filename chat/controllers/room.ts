@@ -886,7 +886,7 @@ export const logout_user_sockets = async ( payload: ChatPayload ) => {
         if (!room_db) 
             return { ok: false, msg: 'Room does not exists' };
 
-        // chat user exists
+        // chat user exists?
         const chatuser_db = await ChatUser.findOne({ nickname });
         if (!chatuser_db) 
             return { ok: false, msg: 'Chat user does not exists' };
