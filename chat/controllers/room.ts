@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import User from '../../auth/models/user';
 import Room from '../models/room';
 import ChatUser from '../models/chatuser';
+import Msg from '../models/msg';
 // Helpers
 import { is_another_user_profile_connected, it_belongs_to } from "../helpers/chat";
 // Interfaces
@@ -608,8 +609,15 @@ export const delete_chat_room = async (req: Request, res: Response) => {
             const chat_user_rooms = chat_user_db.rooms.filter((id: String) => {
                 return id != room_id;
             });
+
+            // Delete room msgs from chat user msgs
+            for(let msg of room_db.msgs) {
+                const id: number = chat_user_db.msgs.indexOf(msg);
+                if(id !== -1) chat_user_db.msgs.splice(id, 1); 
+            };
+
             await chat_user_db.updateOne(
-                { rooms: chat_user_rooms }
+                { rooms: chat_user_rooms, msgs: chat_user_db.msgs }
             );
         };
         ///////////////////////////////////////////////////////////////////////
@@ -622,7 +630,12 @@ export const delete_chat_room = async (req: Request, res: Response) => {
             { rooms: user_rooms }
         );
 
-        // STEP III: Delete room
+        // STEP III: Delete room msgs from Msg
+        for(let msg of room_db.msgs) {
+            await Msg.findByIdAndDelete(msg);
+        };
+
+        // STEP IV: Delete room
         await Room.deleteOne(
             { _id: room_id },
             { new: true }
