@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import User from '../../auth/models/user';
 import ChatUser from '../models/chatuser';
 import Room from '../models/room';
+import Msg from '../models/msg';
 // Helpers
 import { it_belongs_to } from "../helpers/chat";
 
@@ -268,20 +269,29 @@ export const delete_chat_user = async (req: Request, res: Response) => {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        // STEP I: Delete chat user from rooms where is connected
+        // STEP I: Delete chat user and msgs from rooms where is connected
         const connected_rooms = chat_user_db.rooms;
             // Get room
             // get chat users array 
             // delete chat user 
-            // save room with new chat user array
+            // delete chat user msgs from room
+            // save room with new chat user and room array
             // Move next room in array
+
         for (let room_id of connected_rooms) {
             const room_db = await Room.findById(room_id);
             const room_chat_users = room_db.chatusers.filter((id: String) => {
                 return id != chat_user_id;
             });
+
+            // Delete chat user msgs from room
+            for(let msg of chat_user_db.msgs) {
+                const id: number = room_db.msgs.indexOf(msg);
+                if(id !== -1) room_db.msgs.splice(id, 1); 
+            };
+            
             await room_db.updateOne(
-                { chatusers: room_chat_users }
+                { chatusers: room_chat_users, msgs: room_db.msgs }
             );
         };
         ///////////////////////////////////////////////////////////////////////
@@ -294,7 +304,12 @@ export const delete_chat_user = async (req: Request, res: Response) => {
             { chatusers: user_chat_users }
         );
 
-        // STEP III: Delete chat user
+        // STEP III: Delete chat user msgs from Msg
+        for(let msg of chat_user_db.msgs) {
+            await Msg.findByIdAndDelete(msg);
+        };
+
+        // STEP IV: Delete chat user
         await ChatUser.deleteOne(
             { _id: chat_user_id }, 
             { new: true }
