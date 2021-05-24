@@ -61,7 +61,7 @@ export const room_login = (client: Socket, io: socketIO.Server) => {
             else {
                 callback(resp);
                 io.emit(
-                    `${resp.room!.name}-login-user`,
+                    `${resp.room!._id}-login-user`,
                     {
                         nickname: resp.chatuser!.nickname,
                         desc: resp.chatuser?.desc,
