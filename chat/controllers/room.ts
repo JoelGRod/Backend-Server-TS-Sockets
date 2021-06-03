@@ -522,7 +522,8 @@ export const remove_chat_user_chat_room = async (req: Request, res: Response) =>
 // Get all chat users from a room
 export const get_room_chat_users = async (req: Request, res: Response) => {
 
-    const { room_id, uid } = req.body;
+    const { uid } = req.body;
+    const { room_id } = req.query;
     try {
         // Security Validations
         // Main User exists?
@@ -535,7 +536,7 @@ export const get_room_chat_users = async (req: Request, res: Response) => {
         }
 
         // Room exists? and populate chatusers from room
-        const exclusions: String = '-_id -rooms -msgs -created_at -modified_at -__v';
+        const exclusions: String = '-rooms -msgs -desc -user -modified_at -__v';
         const room_db = await Room.findById(room_id).populate('chatusers', exclusions);
         if (!room_db) {
             return res.status(400).json({
@@ -551,7 +552,7 @@ export const get_room_chat_users = async (req: Request, res: Response) => {
                 _id: room_db.id,
                 name: room_db.name
             },
-            chatusers: room_db.chatusers
+            profiles: room_db.chatusers
         });
 
     } catch (error) {
