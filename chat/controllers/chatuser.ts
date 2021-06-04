@@ -349,7 +349,15 @@ export const get_specific_chat_user = async (req: Request, res: Response) => {
         };
 
         // chatuserexists? and populate chatusers from room
-        const chatuser_db = await ChatUser.findById(profile_id, {nickname: 1, desc: 1, photo: 1});
+        const chatuser_db = await ChatUser.findById(profile_id, {nickname: 1, desc: 1, photo: 1, rooms: 1})
+        // .populate({
+        //     path: 'rooms',
+        //     select: '_id',
+        //     populate: {
+        //         path: 'chatuser',
+        //         select: 'nickname'
+        //     }
+        // });
         if (!chatuser_db) {
             return res.status(400).json({
                 ok: false,
@@ -360,9 +368,10 @@ export const get_specific_chat_user = async (req: Request, res: Response) => {
         // chat_user belongs to main user?
         const is_chat_user_valid = it_belongs_to(user_db.chatusers, chatuser_db.id);
         if(!is_chat_user_valid) {
-            return res.status(400).json({
+            return res.status(200).json({ // WARNING
                 ok: false,
-                msg: 'The chat user does not belong to the user'
+                msg: 'The chat user does not belong to the user',
+                profile: chatuser_db 
             });
         };
 
