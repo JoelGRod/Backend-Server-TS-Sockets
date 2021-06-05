@@ -396,8 +396,9 @@ export const get_chat_user_rooms = async (req: Request, res: Response) => {
             });
         };
 
-        // chatuserexists? and populate chatusers from room
-        const chatuser_db = await ChatUser.findById(profile_id, {rooms: 1});
+        // chatuserexists? and populate rooms chat user
+        const exclusions = "-__v -chatusers -msgs -desc -photo -has_password -password -created_at -user";
+        const chatuser_db = await ChatUser.findById(profile_id, {rooms: 1}).populate('rooms', exclusions);
         if (!chatuser_db) {
             return res.status(400).json({
                 ok: false,
