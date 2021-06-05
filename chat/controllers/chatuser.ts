@@ -115,7 +115,7 @@ export const update_chat_user_nickname = async (req: Request, res: Response) => 
         return res.status(200).json({
             ok: true,
             msg: `Chat User Updated`,
-            chatuser: {
+            profile: {
                 _id: chat_user_db.id,
                 nickname: chat_user_db.nickname,
                 desc: chat_user_db.desc,
