@@ -239,19 +239,22 @@ export const modify_room_password = async (req: Request, res: Response) => {
         };
 
         // Is the chat room old password correct??
-        const is_correct_password = bcrypt.compareSync(old_password, room_db.password);
-        if (!is_correct_password) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Wrong room old password'
-            });
-        };
+        if(room_db.has_password) {
+            const is_correct_password = bcrypt.compareSync(old_password, room_db.password);
+            if (!is_correct_password) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Wrong room old password'
+                });
+            };
+        }
 
         // Modify Room info
         // Encrypt/hash password
         const salt = bcrypt.genSaltSync();  // Default 10 rounds
         room_db.password = bcrypt.hashSync(new_password, salt);
         room_db.modified_at = Date.now();
+        room_db.has_password = true;
         await room_db.save();
 
         return res.status(200).json({

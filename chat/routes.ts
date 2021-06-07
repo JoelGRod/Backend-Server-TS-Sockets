@@ -120,7 +120,7 @@ chat_router.put('/update-room-info', [
 
 chat_router.put('/update-room-password', [
     check('new_password', 'New Password is required').isLength({min: 3}),
-    check('old_password', 'Old password is required').isLength({min: 3}),
+    check('old_password', 'Old password is required'),
     check('room_id', 'Room id is required').isLength({min: 3}),
     validate_fields,
     validate_jwt
