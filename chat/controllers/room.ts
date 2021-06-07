@@ -710,7 +710,8 @@ export const get_specific_chat_room = async (req: Request, res: Response) => {
                 desc: room_db.desc,
                 photo: room_db.photo,
                 has_password: room_db.has_password,
-                created_at: room_db.created_at
+                created_at: room_db.created_at,
+                user: room_db.user
             }
         });
     } catch (error) {
