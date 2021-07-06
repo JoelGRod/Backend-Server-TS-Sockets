@@ -38,8 +38,7 @@ export const send_contact_email = async (req: Request, res: Response) => {
                 // Succesful response
                 return res.status(200).json({
                     ok: true,
-                    msg: `Email Sent`,
-                    info
+                    msg: `Email Sent`
                 });
             };
         });
