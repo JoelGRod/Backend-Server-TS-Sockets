@@ -31,8 +31,7 @@ export const send_contact_email = async (req: Request, res: Response) => {
                 // Error response
                 return res.status(400).json({
                     ok: false,
-                    msg: `Error Email`,
-                    err
+                    msg: `Error Email`
                 });
             } else {
                 // Succesful response
