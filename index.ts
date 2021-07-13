@@ -16,6 +16,8 @@ server.cors()
 server.body_parse();
 // Routes
 server.define_routes();
+// Public directory
+server.define_public();
 
 // Start server
 server.start_server( () => {

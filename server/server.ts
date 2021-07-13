@@ -65,6 +65,12 @@ export default class Server {
         this.app.use('/api/email/', email_router);
     }
 
+    // Public directory
+    define_public() {
+        this.app.use( express.static('public') );
+    }
+
+    // Server
     start_server( callback: VoidFunction ) {
         this.http_server.listen( this.port, callback);
     }
