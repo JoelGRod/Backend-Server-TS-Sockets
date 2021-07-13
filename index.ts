@@ -18,6 +18,8 @@ server.body_parse();
 server.define_routes();
 // Public directory
 server.define_public();
+// Extra routes
+server.define_extra_routes();
 
 // Start server
 server.start_server( () => {

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import socketIO from 'socket.io';
 import http from 'http';
+import path from 'path';
 // Sockets events
 import * as socket from './sockets';
 import * as chat_socket from '../chat/sockets';
@@ -68,6 +69,13 @@ export default class Server {
     // Public directory
     define_public() {
         this.app.use( express.static('public') );
+    }
+
+    // Define extra routes
+    define_extra_routes() {
+        this.app.get( '*', ( req, res ) => {
+            res.sendFile( path.resolve( __dirname, '../../public/index.html' ) );
+        });
     }
 
     // Server
