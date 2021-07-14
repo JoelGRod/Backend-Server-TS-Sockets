@@ -40,7 +40,8 @@ const send_contact_email = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 // Error response
                 return res.status(400).json({
                     ok: false,
-                    msg: `Error Email`
+                    msg: `Error Email`,
+                    error: err
                 });
             }
             else {
