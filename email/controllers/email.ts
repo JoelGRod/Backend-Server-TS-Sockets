@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import nodemailer from 'nodemailer';
+import { transporter_generator } from '../../server/oauth2';
 
 // Create new chat user
 export const send_contact_email = async (req: Request, res: Response) => {
@@ -7,13 +7,7 @@ export const send_contact_email = async (req: Request, res: Response) => {
 
     try {
 
-        const transport = nodemailer.createTransport({
-            service: String(process.env.EMAIL_SERVICE),
-            auth: {
-                user: String(process.env.EMAIL_USER),
-                pass: String(process.env.EMAIL_PASS)
-            }
-        });
+        const transport = await transporter_generator();
 
         const email_options = {
             from: String(process.env.EMAIL_USER),

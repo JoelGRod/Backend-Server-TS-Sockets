@@ -8,23 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.send_contact_email = void 0;
-const nodemailer_1 = __importDefault(require("nodemailer"));
+const oauth2_1 = require("../../server/oauth2");
 // Create new chat user
 const send_contact_email = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, contact_email, subject, msg } = req.body;
     try {
-        const transport = nodemailer_1.default.createTransport({
-            service: String(process.env.EMAIL_SERVICE),
-            auth: {
-                user: String(process.env.EMAIL_USER),
-                pass: String(process.env.EMAIL_PASS)
-            }
-        });
+        const transport = yield oauth2_1.transporter_generator();
         const email_options = {
             from: String(process.env.EMAIL_USER),
             to: String(process.env.EMAIL_DESTINATION),
