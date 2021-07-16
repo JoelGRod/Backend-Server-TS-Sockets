@@ -1,6 +1,7 @@
 # Node - Express REST Server (Typescript)(Sockets)
 
     This is the backend that has been used for my personal portfolio. It has connection with database, api endpoints (HTTP) and Sockets connection.
+    Frontend: https://github.com/JoelGRod/Basic-Sockets-App
 
 # Steps:
     First time:
